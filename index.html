@@ -1,364 +1,668 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Esnafız — Küçük İşletmeler için Akıllı Yönetim</title>
-  <meta name="description" content="Esnafız; stok, satış, finans, topluluk ve yapay zekâ destekli analizleri tek yerde birleştiren modern işletme yönetim platformudur." />
-  <meta name="theme-color" content="#ff6a00" />
-  <meta property="og:title" content="Esnafız — Küçük İşletmeler için Akıllı Yönetim" />
-  <meta property="og:description" content="Stok, satış, topluluk ve yapay zekâ analizleri tek yerde. Ücretsiz tanıtım demosu için tıklayın." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://esnafiz.app" />
-  <!-- Favicons (güncelleyebilirsin) -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2248%22 fill=%22%23ff6a00%22/><text x=%2250%25%22 y=%2258%25%22 font-size=%2255%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22Segoe UI%2C Roboto%2C Arial%22>E</text></svg>">
-  <style>
-    :root{
-      --bg:#0b0c10;
-      --card:#111217;
-      --muted:#a4a9b6;
-      --text:#f6f7fb;
-      --brand:#ff6a00;      /* ana turuncu */
-      --brand-2:#ff9400;    /* degrade için */
-      --ok:#10b981;
-      --warn:#f59e0b;
-      --crit:#ef4444;
-      --shadow: 0 10px 30px rgba(0,0,0,.35);
-      --radius:18px;
-      --max:1200px;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:esnafiz/providers/cart_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:esnafiz/core/controllers/scanner_controller.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:esnafiz/models/sold_product.dart';
+import 'package:esnafiz/core/utils/snackbar_utils.dart';
+import 'package:esnafiz/core/widgets/white_box.dart';
+
+class SaleScannerScreen extends ConsumerStatefulWidget {
+  const SaleScannerScreen({super.key});
+
+  @override
+  ConsumerState<SaleScannerScreen> createState() => _SaleScannerScreenState();
+}
+
+class _SaleScannerScreenState extends ConsumerState<SaleScannerScreen> {
+  bool _isScanned = false;
+  bool _isInitialized = false;
+
+  Future<bool> _checkCameraPermission() async {
+    final status = await Permission.camera.status;
+    if (status.isGranted) {
+      return true;
     }
-    @media (prefers-color-scheme: light){
-      :root{ --bg:#f7f8fb; --card:#ffffff; --text:#0e1016; --muted:#5b6270; --shadow:0 10px 25px rgba(20,23,28,.08)}
-      header.nav{ backdrop-filter: saturate(140%) blur(10px); background: rgba(255,255,255,.75); border-bottom:1px solid rgba(0,0,0,.06);}
+    final result = await Permission.camera.request();
+    return result.isGranted;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeScanner();
+  }
+
+  Future<void> _initializeScanner() async {
+    if (await _checkCameraPermission()) {
+      try {
+        // Daha hızlı başlatma - gereksiz dispose'u kaldır
+        await ScannerController.initialize();
+
+        if (mounted) {
+          setState(() {
+            _isInitialized = true;
+          });
+        }
+
+        print('✅ Scanner başarıyla başlatıldı');
+      } catch (e) {
+        print('❌ Scanner initialization error: $e');
+        if (mounted) {
+          SnackBarUtils.showError(context, 'Kamera başlatılamadı');
+        }
+      }
+    } else {
+      if (mounted) {
+        SnackBarUtils.showError(context, 'Kamera izni gerekli');
+      }
     }
-    *{box-sizing:border-box}
-    html,body{margin:0; padding:0; font-family: 'Segoe UI', Roboto, Arial, sans-serif; color:var(--text); background:linear-gradient(180deg, var(--bg), #0f1117 60%, var(--bg)); scroll-behavior:smooth}
-    a{color:var(--brand); text-decoration:none}
-    .container{max-width:var(--max); margin-inline:auto; padding-inline:20px}
-    .btn{
-      display:inline-flex; align-items:center; gap:10px;
-      padding:12px 20px; border-radius:12px; font-weight:600; letter-spacing:.2px;
-      background:linear-gradient(135deg, var(--brand), var(--brand-2));
-      color:white; box-shadow:var(--shadow); border:none; cursor:pointer; transition:transform .15s ease
+  }
+
+  @override
+  void dispose() {
+    // Daha hızlı dispose - buffer temizlemeyi kaldır
+    ScannerController.dispose();
+    ref.read(cartProvider.notifier).clear();
+    super.dispose();
+  }
+
+  Future<Map<String, dynamic>?> _findProduct(String barcode) async {
+    // Aktif dükkan ID'sini al
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? activeStoreId = prefs.getString('activeStoreId');
+
+    if (activeStoreId == null) {
+      throw Exception('Aktif mağaza bulunamadı');
     }
-    .btn:hover{ transform: translateY(-2px) }
-    .btn.ghost{ background:transparent; color:var(--text); border:1px solid rgba(255,255,255,.18)}
-    header.nav{
-      position:sticky; top:0; z-index:50; width:100%;
-      border-bottom:1px solid rgba(255,255,255,.08);
-      background:rgba(11,12,16,.55); backdrop-filter: blur(10px)
+
+    // Sadece aktif dükkana ait ürünleri ara
+    final productQuery = await FirebaseFirestore.instance
+        .collection('items')
+        .where('barcode', isEqualTo: barcode)
+        .where('storeId', isEqualTo: activeStoreId)
+        .get();
+
+    if (productQuery.docs.isNotEmpty) {
+      return productQuery.docs.first.data();
     }
-    .nav-inner{display:flex; align-items:center; justify-content:space-between; gap:18px; padding:14px 0}
-    .brand{display:flex; align-items:center; gap:12px; font-weight:800}
-    .brand .logo{width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,var(--brand),var(--brand-2)); display:grid; place-items:center; color:#fff; font-weight:900}
-    .links{display:flex; gap:18px; flex-wrap:wrap}
-    .links a{color:var(--text); opacity:.9}
-    .hero{
-      padding:80px 0 40px; position:relative; overflow:hidden;
-      background:
-        radial-gradient(1200px 400px at 70% -10%, rgba(255,106,0,.18), transparent 60%),
-        radial-gradient(900px 300px at 0% 10%, rgba(255,148,0,.14), transparent 60%)
+
+    final cartItems = ref.read(cartProvider).items;
+    final cartProduct = cartItems.firstWhere(
+      (item) => item['barcode']?.toString() == barcode,
+      orElse: () => {},
+    );
+
+    if (cartProduct.isNotEmpty) {
+      return cartProduct;
     }
-    .hero-grid{display:grid; grid-template-columns: 1.1fr .9fr; gap:40px; align-items:center}
-    .kicker{font-size:.95rem; color:var(--muted); text-transform:uppercase; letter-spacing:.18em}
-    h1{font-size: clamp(30px, 5vw, 56px); line-height:1.06; margin:10px 0 14px}
-    .lead{font-size: clamp(15px, 2.2vw, 20px); color:var(--muted)}
-    .cta{display:flex; gap:12px; margin-top:22px; flex-wrap:wrap}
-    .card{
-      background:var(--card); border:1px solid rgba(255,255,255,.06);
-      border-radius:var(--radius); box-shadow:var(--shadow)
+
+    return null;
+  }
+
+  Future<void> _onBarcodeDetected(String code) async {
+    if (_isScanned || !_isInitialized) return;
+    _isScanned = true;
+
+    try {
+      final product = await _findProduct(code);
+
+      if (product != null) {
+        if (mounted) {
+          final cartItem = {
+            'name': product['name'],
+            'price': product['price'],
+            'purchase_price': product['purchase_price'] ?? 0.0,
+            'barcode': code,
+          };
+          print(
+              '🛒 Sepete ekleniyor: ${product['name']} - Alış fiyatı: ₺${product['purchase_price'] ?? 0.0}');
+          ref.read(cartProvider.notifier).add(cartItem);
+
+          SnackBarUtils.showSuccess(
+              context, 'Sepete eklendi: ${product['name']}');
+        }
+      } else {
+        if (mounted) {
+          SnackBarUtils.showError(context, 'Ürün bulunamadı');
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        SnackBarUtils.showError(context, 'Bir hata oluştu');
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isScanned = false;
+        });
+      }
     }
-    .screen{
-      aspect-ratio: 16 / 10; width:100%; border-radius:16px; overflow:hidden; border:1px solid rgba(255,255,255,.06);
-      background:
-       linear-gradient(180deg, #171922, #0f1117),
-       repeating-linear-gradient(90deg, rgba(255,255,255,.02) 0 1px, transparent 1px 6px);
-      position:relative
+  }
+
+  Future<void> _completeOrder() async {
+    final cart = ref.read(cartProvider);
+    final items = cart.items;
+    if (items.isEmpty) return;
+
+    final total = items.fold<double>(
+      0,
+      (sum, item) => sum + (item['price'] as num).toDouble(),
+    );
+
+    try {
+      final userUid = FirebaseAuth.instance.currentUser?.uid;
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? activeStoreId = prefs.getString('activeStoreId');
+      if (userUid == null) {
+        throw Exception('Kullanıcı oturumu bulunamadı');
+      }
+      if (activeStoreId == null) {
+        throw Exception('Aktif mağaza bulunamadı');
+      }
+
+      // Stok güncelleme ve satılan ürünleri kaydetme işlemleri
+      for (var item in items) {
+        try {
+          final productQuery = await FirebaseFirestore.instance
+              .collection('items')
+              .where('barcode', isEqualTo: item['barcode'])
+              .where('storeId', isEqualTo: activeStoreId)
+              .get();
+
+          if (productQuery.docs.isEmpty) {
+            throw Exception('Ürün bulunamadı: ${item['name']}');
+          }
+
+          final productDoc = productQuery.docs.first;
+          final productData = productDoc.data();
+          final currentStock = productData['stock'] ?? 0;
+          final newStock = currentStock - (item['count'] ?? 1);
+
+          if (newStock < 0) {
+            throw Exception('Yetersiz stok: ${item['name']}');
+          }
+
+          // Stok güncelle
+          await productDoc.reference.update({
+            'stock': newStock,
+          });
+
+          // Kritik stok kontrolü
+          final shouldNotify = newStock <= (productData['critical_stock'] ?? 5);
+
+          // Bildirim: Stok güncellendi
+          await FirebaseFirestore.instance.collection('notifications').add({
+            'type': 'stock_updated',
+            'title': 'Stok Güncellendi!',
+            'description': '${productData['name']} ürününün stoğu güncellendi.',
+            'user_id': productData['user_id'],
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+
+          if (shouldNotify) {
+            await FirebaseFirestore.instance.collection('notifications').add({
+              'type': 'low_stock',
+              'title': 'Stok Kritik!',
+              'description':
+                  '${productData['name']} ürününün stoğu kritik seviyeye düştü. (Stok: $newStock)',
+              'user_id': productData['user_id'],
+              'createdAt': FieldValue.serverTimestamp(),
+            });
+          }
+
+          // Satılan ürünü kaydet
+          final soldProduct = SoldProduct(
+            id: '', // Firestore will generate this
+            name: item['name'],
+            barcode: item['barcode'],
+            price: item['price'],
+            purchasePrice: item['purchase_price'] ?? 0.0,
+            quantity: item['count'] ?? 1,
+            soldDate: DateTime.now(),
+            userId: userUid ?? '',
+            category: productData['category'],
+            description: productData['description'],
+          );
+
+          await SoldProduct.addSoldProduct(soldProduct);
+        } catch (e) {
+          print('Ürün işleme hatası: ${item['name']} - $e');
+          throw Exception('Ürün işlenirken hata: ${item['name']} - $e');
+        }
+      }
+
+      // Toplam alış maliyetini hesapla
+      double totalCost = 0;
+      print('🔍 Alış maliyeti hesaplanıyor...');
+      for (var item in items) {
+        final purchasePrice = (item['purchase_price'] ?? 0.0).toDouble();
+        final quantity = (item['count'] ?? 1).toInt();
+        final itemCost = purchasePrice * quantity;
+        totalCost += itemCost;
+        print(
+            '📦 ${item['name']}: Alış fiyatı: ₺$purchasePrice, Miktar: $quantity, Maliyet: ₺$itemCost');
+      }
+      print('💰 Toplam alış maliyeti: ₺$totalCost');
+
+      // İşlem kaydı (gelir)
+      print('✅ Satış kaydı oluşturuluyor...');
+      final transactionRef =
+          await FirebaseFirestore.instance.collection('transactions').add({
+        'user_id': userUid,
+        'title': 'Satış',
+        'category': 'Satış',
+        'amount': total,
+        'items': items,
+        'date': DateTime.now(),
+        'created_at': FieldValue.serverTimestamp(),
+        'storeId': activeStoreId,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+      print('✅ Satış kaydı oluşturuldu: ${transactionRef.id}');
+
+      // Alış maliyeti gider kaydı
+      if (totalCost > 0) {
+        print('💸 Gider kaydı oluşturuluyor... Maliyet: ₺$totalCost');
+        await FirebaseFirestore.instance.collection('transactions').add({
+          'user_id': userUid,
+          'title': 'Satılan Ürünlerin Alış Maliyeti',
+          'category': 'Maliyet',
+          'amount': -totalCost, // Negatif değer gider olarak
+          'items': items,
+          'date': DateTime.now(),
+          'created_at': FieldValue.serverTimestamp(),
+          'storeId': activeStoreId,
+          'createdAt': FieldValue.serverTimestamp(),
+          'related_sale_id': transactionRef.id, // Satış ile ilişkilendir
+        });
+        print('✅ Gider kaydı oluşturuldu');
+      } else {
+        print('⚠️ Alış maliyeti 0 veya negatif, gider kaydı oluşturulmadı');
+      }
+
+      // Bildirim: Satış tamamlandı
+      await FirebaseFirestore.instance.collection('notifications').add({
+        'type': 'sale_completed',
+        'title': 'Satış Tamamlandı!',
+        'description':
+            '₺${total.toStringAsFixed(2)} tutarında satış tamamlandı.',
+        'user_id': userUid,
+        'transactionId': transactionRef.id,
+        'amount': total,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+      ref.read(cartProvider.notifier).clear();
+      if (mounted) {
+        SnackBarUtils.showCompletion(context, 'Sipariş tamamlandı');
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      print('Sipariş tamamlama hatası: $e');
+      if (mounted) {
+        SnackBarUtils.showErrorWithAction(
+          context,
+          'Sipariş tamamlanamadı: ${e.toString()}',
+          actionLabel: 'Tamam',
+          onActionPressed: () {},
+        );
+      }
     }
-    .chip{display:inline-flex; gap:8px; align-items:center; padding:7px 10px; border-radius:999px; background:rgba(255,255,255,.06); color:var(--text); font-weight:600; font-size:.85rem}
-    .row{display:grid; grid-template-columns: repeat(3,1fr); gap:20px}
-    .feat{padding:22px; display:flex; gap:14px}
-    .feat .icon{width:44px; height:44px; border-radius:12px; background:rgba(255,255,255,.06); display:grid; place-items:center}
-    h2{font-size: clamp(24px, 3.4vw, 36px); margin:0 0 14px}
-    section{padding:56px 0}
-    .split{display:grid; grid-template-columns: 1fr 1fr; gap:26px}
-    .list{display:grid; gap:10px}
-    .list li{list-style:none; padding:12px 14px; border:1px solid rgba(255,255,255,.08); border-radius:12px; background:rgba(255,255,255,.03)}
-    .badge{padding:4px 10px; border-radius:999px; background:rgba(16,185,129,.14); color:#b7f7de; font-weight:700; letter-spacing:.04em; font-size:.8rem}
-    .kpis{display:grid; grid-template-columns:repeat(4,1fr); gap:14px}
-    .kpi{padding:18px; text-align:center}
-    .kpi b{font-size:28px; display:block}
-    .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:18px}
-    .tag{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; border:1px dashed rgba(255,255,255,.16); color:var(--muted); font-size:.85rem}
-    .faq details{background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:14px 16px}
-    .faq details+details{margin-top:10px}
-    .faq summary{cursor:pointer; font-weight:700}
-    .foot{padding:40px 0; border-top:1px solid rgba(255,255,255,.1); color:var(--muted); font-size:.95rem}
-    .center{text-align:center}
-    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace}
-    .hint{color:var(--muted); font-size:.9rem}
-    .pill{padding:6px 10px; border-radius:999px; background:rgba(255,106,0,.12); color:#ffd7bf; font-weight:700}
-    .form{display:grid; gap:12px}
-    input, textarea{
-      width:100%; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.12);
-      padding:12px 14px; color:var(--text); border-radius:12px; outline:none
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_isInitialized) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
     }
-    input:focus, textarea:focus{ border-color: var(--brand)}
-    .note{font-size:.85rem; color:var(--muted)}
-    /* küçük ekranlar */
-    @media (max-width: 960px){
-      .hero-grid, .row, .split, .grid-2, .kpis{ grid-template-columns:1fr }
-      .links{display:none}
-    }
-    /* ufak animasyonlar */
-    @keyframes float { from{transform:translateY(0)} to{transform:translateY(-6px)} }
-    .float{ animation: float 2s ease-in-out infinite alternate }
-  </style>
-  <script>
-    // Basit yapışkan nav link highlight
-    addEventListener('scroll', () => {
-      const pos = scrollY + 120;
-      document.querySelectorAll('section[id]').forEach(s=>{
-        const a = document.querySelector('a[href="#'+s.id+'"]');
-        if(!a) return;
-        if(pos> s.offsetTop && pos < s.offsetTop+s.offsetHeight){ a.style.opacity='1'; a.style.fontWeight='800' }
-        else { a.style.opacity='.9'; a.style.fontWeight='600' }
-      })
-    });
-  </script>
-</head>
-<body>
 
-  <!-- NAV -->
-  <header class="nav">
-    <div class="container nav-inner">
-      <div class="brand">
-        <div class="logo">E</div>
-        <span>Esnafız</span>
-        <span class="pill">Beta</span>
-      </div>
-      <nav class="links">
-        <a href="#ozellikler">Özellikler</a>
-        <a href="#moduller">Modüller</a>
-        <a href="#yapay-zeka">Yapay Zekâ</a>
-        <a href="#entegrasyon">Entegrasyon</a>
-        <a href="#sss">SSS</a>
-        <a href="#iletisim">İletişim</a>
-      </nav>
-      <a class="btn" href="#demo">Demo Talep Et</a>
-    </div>
-  </header>
+    return WillPopScope(
+      onWillPop: () async {
+        ref.read(cartProvider.notifier).clear();
+        return true;
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          elevation: 0,
+          title: const Text(
+            'Barkod ile Satış',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+            ),
+          ),
+          centerTitle: true,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () {
+              ref.read(cartProvider.notifier).clear();
+              Navigator.pop(context);
+            },
+          ),
+        ),
+        body: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            borderRadius: BorderRadius.zero, // ✅ Sıfır radius
+          ),
+          padding: EdgeInsets.zero, // ✅ Sıfır padding
+          child: Column(
+            children: [
+              // ✅ ÜST: Kamera (tam ekran)
+              Expanded(
+                flex: 3, // %60 alan
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    print('🔍 ===== LAYOUT BUILDER ÇALIŞIYOR =====');
+                    print(
+                        '📱 Kamera alanı: ${constraints.maxWidth}x${constraints.maxHeight}');
+                    print('🔍 WhiteBox edgeToEdge: true');
+                    print('🔍 Padding: EdgeInsets.zero');
+                    print('🔍 BorderRadius: BorderRadius.zero');
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="container hero-grid">
-      <div>
-        <div class="kicker">İşletmenizi tek panelden yönetin</div>
-        <h1>Kasa, stok, satış ve <span style="background:linear-gradient(135deg,var(--brand),var(--brand-2)); -webkit-background-clip:text; color:transparent">Yapay Zekâ analizleri</span> bir arada.</h1>
-        <p class="lead">Esnafız; küçük ve orta ölçekli işletmeler için geliştirilen, <b>Flutter</b> tabanlı, <b>Firebase</b> destekli, ölçeklenebilir bir yönetim platformudur. Barkodlu satıştan topluluk forumuna, finans raporlarından AI önerilerine kadar her şey tek yerde.</p>
-        <div class="cta">
-          <a class="btn" href="#demo">Ücretsiz Demosu Al</a>
-          <a class="btn ghost" href="#ozellikler">Özellikleri Keşfet</a>
-        </div>
-        <div style="margin-top:14px" class="hint">SSL’li, güvenli ve hızlı — <span class="mono">esnafiz.app</span> üzerinde barındırılır.</div>
-      </div>
-      <div class="card screen float" aria-hidden="true">
-        <!-- Basit görsel mock -->
-        <div style="position:absolute; inset:16px; display:grid; grid-template-columns: 240px 1fr; gap:16px;">
-          <div class="card" style="padding:12px">
-            <div class="chip">Stok Uyarıları</div>
-            <ul class="list" style="margin:12px 0 0; padding:0">
-              <li><b class="crit">ACİL</b> — Su 0.5L (2 gün içinde bitecek)</li>
-              <li><b class="warn">KRİTİK</b> — Ekmek (4 güne düşer)</li>
-              <li><b class="ok">OK</b> — Ayran (yeterli)</li>
-            </ul>
-          </div>
-          <div class="card" style="padding:16px">
-            <div class="kpis">
-              <div class="kpi"><b>₺5.420</b><span class="hint">Bugünkü Ciro</span></div>
-              <div class="kpi"><b>+12%</b><span class="hint">Haftalık</span></div>
-              <div class="kpi"><b>38</b><span class="hint">Satış</span></div>
-              <div class="kpi"><b>7</b><span class="hint">Uyarı</span></div>
-            </div>
-            <div style="margin-top:16px" class="chip">AI: “Bugün 16:00–18:00 arası kasa yoğunluğu bekleniyor.”</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+                    // ✅ Dinamik tarama alanı - ekran boyutuna göre
+                    final scanWidth =
+                        constraints.maxWidth * 0.8; // %80 genişlik
+                    final scanHeight = scanWidth * 0.6; // 3:2 oranı
+                    final center = Offset(
+                      constraints.maxWidth / 2,
+                      constraints.maxHeight / 2,
+                    );
 
-  <!-- ÖZELLİKLER -->
-  <section id="ozellikler">
-    <div class="container">
-      <h2>Öne çıkan özellikler</h2>
-      <p class="hint">Sade tasarım, güçlü altyapı ve hızlı kullanım. Turuncu–beyaz kurumsal temaya uyumlu modern arayüz.</p>
-      <div class="row" style="margin-top:18px">
-        <div class="card feat">
-          <div class="icon">📦</div>
-          <div><b>Stok & Ürün Yönetimi</b><div class="hint">Ürün ekle, barkodla tara, hızlı stok güncelle. Kritik stoklar için otomatik uyarı.</div></div>
-        </div>
-        <div class="card feat">
-          <div class="icon">🧾</div>
-          <div><b>Barkodlu Satış</b><div class="hint">Hızlı POS akışı, indirim/vergiler, günlük kasa raporları.</div></div>
-        </div>
-        <div class="card feat">
-          <div class="icon">📈</div>
-          <div><b>Finans & Raporlama</b><div class="hint">Gelir–gider, kârlılık, haftalık/aylık trendler ve CSV dışa aktarma.</div></div>
-        </div>
-        <div class="card feat">
-          <div class="icon">🤝</div>
-          <div><b>Topluluk & Forum</b><div class="hint">Esnaflar arası bilgi paylaşımı, etkinlikler ve moderasyon araçları.</div></div>
-        </div>
-        <div class="card feat">
-          <div class="icon">🧠</div>
-          <div><b>Yapay Zekâ Önerileri</b><div class="hint">Satış hızına göre stok önerisi, toptancı fiyat kıyasları, riskli ürün alarmı.</div></div>
-        </div>
-        <div class="card feat">
-          <div class="icon">🔔</div>
-          <div><b>Gerçek Zamanlı Bildirim</b><div class="hint">FCM ile stok, sipariş ve ekip bildirimleri.</div></div>
-        </div>
-      </div>
-    </div>
-  </section>
+                    print(
+                        '🎯 Tarama alanı: ${scanWidth.toInt()}x${scanHeight.toInt()}');
+                    print(
+                        '📍 Merkez: ${center.dx.toInt()}, ${center.dy.toInt()}');
 
-  <!-- MODÜLLER -->
-  <section id="moduller">
-    <div class="container split">
-      <div>
-        <h2>Modüller</h2>
-        <ul class="list" style="margin:0; padding:0">
-          <li>📦 <b>Ürün & Stok:</b> Kategori, barkod, varyant, hızlı stok giriş/çıkış</li>
-          <li>🛒 <b>Satış:</b> Barkodlu satış, iade, indirim, günlük kasa</li>
-          <li>📊 <b>Raporlar:</b> Ciro, kârlılık, en çok satan ürün, yoğun saatler</li>
-          <li>👥 <b>Topluluk & Forum:</b> Konu/cevap, etiketler, moderasyon</li>
-          <li>🔐 <b>Yetkiler:</b> Owner/çalışan rolleri, çoklu mağaza</li>
-          <li>🧾 <b>Belgeler:</b> Fatura/irsaliye taslakları, dışa aktarma</li>
-        </ul>
-      </div>
-      <div class="card" style="padding:18px">
-        <span class="badge">Dakikalar içinde kurulum</span>
-        <h3 style="margin:8px 0 6px">Kurulum Akışı</h3>
-        <div class="grid-2">
-          <div class="tag">1 — Mağaza oluştur</div>
-          <div class="tag">2 — Ürünleri içe aktar (CSV)</div>
-          <div class="tag">3 — Barkodlu satışa başla</div>
-          <div class="tag">4 — AI önerilerini aç</div>
-        </div>
-        <p class="note" style="margin-top:10px">Tüm veriler bulutta şifrelenmiş şekilde saklanır. İstediğin zaman dışa aktarabilirsin.</p>
-      </div>
-    </div>
-  </section>
+                    return Stack(
+                      fit: StackFit.expand, // ✅ Tüm alanı kapla
+                      children: [
+                        MobileScanner(
+                          controller: ScannerController.instance,
+                          fit: BoxFit.cover,
+                          onDetect: (capture) {
+                            final List<Barcode> barcodes = capture.barcodes;
+                            for (final barcode in barcodes) {
+                              if (barcode.rawValue != null) {
+                                _onBarcodeDetected(barcode.rawValue!);
+                                break;
+                              }
+                            }
+                          },
+                        ),
+                        // ✅ Sadece kenarları karartan overlay
+                        CustomPaint(
+                          painter: ScannerOverlayPainter(
+                            scanArea: Rect.fromCenter(
+                              center: center,
+                              width: scanWidth,
+                              height: scanHeight,
+                            ),
+                            borderColor: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        // Tarama çizgisi
+                        Center(
+                          child: SizedBox(
+                            width: scanWidth,
+                            height: scanHeight,
+                            child: _BarcodeScanningLine(),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
 
-  <!-- YAPAY ZEKA -->
-  <section id="yapay-zeka">
-    <div class="container split">
-      <div>
-        <h2>Yapay Zekâ ile karar ver, işi hızlandır</h2>
-        <p class="hint">OpenAI + RAG mimarisi. Firestore verilerin bağlam olarak kullanılır; öneriler gerçek satış trendlerine göre oluşturulur.</p>
-        <ul class="list" style="margin:10px 0 0; padding:0">
-          <li>⚡ <b>Stok Uyarıları:</b> ACİL / KRİTİK / UYARI seviyeleri</li>
-          <li>💸 <b>Toptancı Karşılaştırması:</b> Daha düşük maliyeti bul</li>
-          <li>📈 <b>Trend Analizi:</b> En çok satan ürün & saat dilimi</li>
-          <li>🤖 <b>AI Chat:</b> “Bu hafta hangi ürünleri artırayım?” gibi sorular sor</li>
-        </ul>
-      </div>
-      <div class="card" style="padding:18px">
-        <div class="chip">Örnek AI önerisi</div>
-        <pre class="mono" style="white-space:pre-wrap; background:rgba(255,255,255,.03); padding:14px; border-radius:12px; border:1px solid rgba(255,255,255,.08)">
-Stok analizi: Ayran 200ml haftalık satış hızı %18 arttı.
-Öneri: Minimum 4 kasa ek stok.
-Gerekçe: Öğlen (12:00–14:00) satış yoğunluğu.
-Aksiyon: <Satın Alma Listesine Ekle>
-        </pre>
-        <p class="note">Öneriler; sezon, saat aralığı ve kampanya etkilerini dikkate alır.</p>
-      </div>
-    </div>
-  </section>
+              // ✅ ALT: Sepet paneli (beyaz)
+              Expanded(
+                flex: 2, // %40 alan
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(20),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 10,
+                        offset: const Offset(0, -5),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        'Sepet',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).textTheme.bodyLarge?.color,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Expanded(
+                        child: Builder(
+                          builder: (context) {
+                            final cart = ref.watch(cartProvider);
+                            if (cart.items.isEmpty) {
+                              return Center(
+                                child: Text(
+                                  'Sepet boş',
+                                  style: TextStyle(
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.color,
+                                  ),
+                                ),
+                              );
+                            }
+                            return ListView.builder(
+                              itemCount: cart.items.length,
+                              itemBuilder: (context, index) {
+                                final item = cart.items[index];
+                                return ListTile(
+                                  title: Text(item['name']),
+                                  subtitle: Text(
+                                    '₺${item['price'].toStringAsFixed(2)}',
+                                    style: TextStyle(
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
+                                  ),
+                                  trailing: IconButton(
+                                    icon: const Icon(Icons.delete),
+                                    onPressed: () {
+                                      ref
+                                          .read(cartProvider.notifier)
+                                          .remove(item);
+                                    },
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: _completeOrder,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Text(
+                          'Siparişi Tamamla',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
 
-  <!-- ENTEGRASYON -->
-  <section id="entegrasyon">
-    <div class="container">
-      <h2>Altyapı & Entegrasyonlar</h2>
-      <div class="row" style="margin-top:14px">
-        <div class="card feat"><div class="icon">🔥</div><div><b>Firebase</b><div class="hint">Auth, Firestore, FCM, App Check</div></div></div>
-        <div class="card feat"><div class="icon">🧠</div><div><b>OpenAI</b><div class="hint">GPT tabanlı öneri & sohbet</div></div></div>
-        <div class="card feat"><div class="icon">⚙️</div><div><b>FastAPI</b><div class="hint">Analiz mikro servisleri</div></div></div>
-      </div>
-      <p class="note" style="margin-top:10px">Geliştirici misin? REST/JSON uç noktalarına bağlanabilir, raporları dış sistemlere aktarabilirsin.</p>
-    </div>
-  </section>
+class _BarcodeScanningLine extends StatefulWidget {
+  const _BarcodeScanningLine();
 
-  <!-- DEMO / FORM -->
-  <section id="demo">
-    <div class="container split">
-      <div>
-        <h2>Ücretsiz demo iste</h2>
-        <p class="hint">Tanıtım görüşmesi 15–20 dakika sürer. İhtiyacına göre kurulum planı çıkarırız.</p>
-        <form name="demo" method="POST" data-netlify="true" class="form card" style="padding:18px">
-          <input type="hidden" name="form-name" value="demo">
-          <input name="ad" placeholder="Ad Soyad" required>
-          <input name="mail" type="email" placeholder="E-posta" required>
-          <input name="isletme" placeholder="İşletme adı (opsiyonel)">
-          <textarea name="ihtiyac" rows="4" placeholder="Kısaca ihtiyacını anlat (örn. barkodlu satış + stok uyarıları)"></textarea>
-          <button class="btn" type="submit">Talebi Gönder</button>
-          <div class="note">Form Netlify ile güvenle iletilir. Yanıtı 24 saat içinde ulaştırırız.</div>
-        </form>
-      </div>
-      <div class="card" style="padding:18px">
-        <h3>Fiyatlandırma (yakında)</h3>
-        <div class="grid-2" style="margin-top:10px">
-          <div class="list">
-            <div class="list li"><b>Starter</b> — Tek kasa, temel raporlar</div>
-            <div class="list li"><b>Pro</b> — Çoklu kasa, AI önerileri</div>
-          </div>
-          <div class="list">
-            <div class="list li"><b>Enterprise</b> — Çoklu mağaza, özel destek</div>
-            <div class="list li"><b>Topluluk</b> — Forum & etkinlikler</div>
-          </div>
-        </div>
-        <p class="note">Öğrenci projeleri ve STK’lar için özel indirim planı uygulanır.</p>
-      </div>
-    </div>
-  </section>
+  @override
+  State<_BarcodeScanningLine> createState() => _BarcodeScanningLineState();
+}
 
-  <!-- SSS -->
-  <section id="sss">
-    <div class="container faq">
-      <h2>Sık Sorulan Sorular</h2>
-      <details>
-        <summary>Verilerim nerede saklanıyor?</summary>
-        <p class="hint">Verilerin tamamı Firebase Firestore’da saklanır. Erişim rolleri (owner/çalışan) ve App Check ile korunur.</p>
-      </details>
-      <details>
-        <summary>Offline çalışır mı?</summary>
-        <p class="hint">Kritik ekranlarda Firestore’un offline cache’i kullanılır; bağlantı gelince senkronize olur.</p>
-      </details>
-      <details>
-        <summary>Yapay zekâ önerileri nasıl üretiliyor?</summary>
-        <p class="hint">Satış & stok verilerin RAG mimarisiyle işlenir; GPT tabanlı servis anlamlı özet ve aksiyonlar üretir.</p>
-      </details>
-    </div>
-  </section>
+class _BarcodeScanningLineState extends State<_BarcodeScanningLine>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
 
-  <!-- İLETİŞİM -->
-  <section id="iletisim">
-    <div class="container card" style="padding:22px">
-      <div class="center">
-        <h2>İletişim</h2>
-        <p class="hint">Birlikte büyütelim.</p>
-        <p><b>E-posta:</b> <a href="mailto:info@esnafiz.app">info@esnafiz.app</a> &nbsp;•&nbsp; <b>Konum:</b> İzmir, Türkiye</p>
-        <a class="btn" href="#demo">Demo Talep Et</a>
-      </div>
-    </div>
-  </section>
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat(reverse: true);
 
-  <footer class="foot">
-    <div class="container center">
-      © <span id="y"></span> Esnafız • Tüm hakları saklıdır
-      <div class="hint" style="margin-top:6px">Turuncu–beyaz kurumsal tema • Hızlı • Güvenli • Mobil uyumlu</div>
-    </div>
-  </footer>
+    _animation = Tween<double>(begin: 0, end: 1).animate(_controller);
+  }
 
-  <script>document.getElementById('y').textContent=new Date().getFullYear()</script>
-</body>
-</html>
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        return CustomPaint(
+          painter: _ScanningLinePainter(
+            progress: _animation.value,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          child: Container(),
+        );
+      },
+    );
+  }
+}
+
+class _ScanningLinePainter extends CustomPainter {
+  final double progress;
+  final Color color;
+
+  _ScanningLinePainter({
+    required this.progress,
+    required this.color,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 2;
+
+    final y = size.height * progress;
+    canvas.drawLine(
+      Offset(0, y),
+      Offset(size.width, y),
+      paint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_ScanningLinePainter oldDelegate) {
+    return oldDelegate.progress != progress || oldDelegate.color != color;
+  }
+}
+
+class ScannerOverlayPainter extends CustomPainter {
+  final Rect scanArea;
+  final Color borderColor;
+
+  ScannerOverlayPainter({
+    required this.scanArea,
+    required this.borderColor,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.black.withOpacity(0.5)
+      ..style = PaintingStyle.fill;
+
+    // ✅ Sadece kenarları karart - ortayı boş bırak
+    // Üst kısım
+    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, scanArea.top), paint);
+
+    // Alt kısım
+    canvas.drawRect(
+        Rect.fromLTWH(
+            0, scanArea.bottom, size.width, size.height - scanArea.bottom),
+        paint);
+
+    // Sol kısım
+    canvas.drawRect(
+        Rect.fromLTWH(0, scanArea.top, scanArea.left, scanArea.height), paint);
+
+    // Sağ kısım
+    canvas.drawRect(
+        Rect.fromLTWH(scanArea.right, scanArea.top, size.width - scanArea.right,
+            scanArea.height),
+        paint);
+
+    // Kenarlık çiz
+    final borderPaint = Paint()
+      ..color = borderColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4;
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        scanArea,
+        const Radius.circular(16),
+      ),
+      borderPaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(ScannerOverlayPainter oldDelegate) {
+    return oldDelegate.scanArea != scanArea ||
+        oldDelegate.borderColor != borderColor;
+  }
+}

@@ -1,11 +1,125 @@
-<!doctype html><html lang="tr"><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Teşekkürler</title>
-<link rel="icon" href="/assets/images/logo.png">
-<body style="font-family:system-ui,Segoe UI,Roboto;display:grid;place-items:center;height:100svh;background:#121212;color:#e0e0e0">
-  <div style="max-width:640px;padding:24px">
-    <h1>Teşekkürler!</h1>
-    <p>Talebin alındı. En kısa sürede dönüş yapacağız.</p>
-    <p><a href="/#demo" style="color:#3A7BD5">Geri dön</a></p>
-  </div>
-</body></html>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Teşekkürler — Esnafız</title>
+  <meta name="theme-color" content="#3A7BD5" />
+  <meta name="description" content="Talebiniz başarıyla alındı. En kısa sürede dönüş yapacağız." />
+
+  <link rel="icon" type="image/png" href="/assets/images/logo.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/assets/images/logo.png">
+
+  <style>
+    :root{
+      --bg:#121212; --surface:#1E1E1E; --surface-2:#2A2A2A;
+      --text:#E0E0E0; --muted:#B3B3B3; --title:#DDDDDD;
+      --brand:#3A7BD5; --brand-2:#2E6BB0; --accent:#DDBB00;
+      --positive:#57A05A;
+      --shadow:0 12px 30px rgba(0,0,0,.35);
+      --radius:18px; --max:900px; --gutter:24px; --header-h:64px;
+    }
+    @media (prefers-color-scheme: light){
+      :root{ --bg:#f7f8fb; --surface:#fff; --surface-2:#fff;
+             --text:#0e1016; --muted:#5b6270; --title:#0e1016;
+             --shadow:0 10px 25px rgba(20,23,28,.08) }
+    }
+    @media (max-width:640px){ :root{ --gutter:16px; --header-h:60px } }
+
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;font-family:'Segoe UI',Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    .container{max-width:var(--max);margin:0 auto;padding:0 var(--gutter)}
+    .card{background:var(--surface);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .btn{
+      display:inline-flex;align-items:center;gap:10px;
+      padding:12px 18px;border-radius:12px;font-weight:600;border:none;cursor:pointer;
+      color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand-2));box-shadow:var(--shadow);
+      text-decoration:none
+    }
+    header.nav{
+      position:sticky;top:0;z-index:10;background:rgba(18,18,18,.6);backdrop-filter:blur(10px);
+      border-bottom:1px solid rgba(255,255,255,.08)
+    }
+    .nav-inner{min-height:var(--header-h);display:flex;align-items:center;justify-content:space-between;padding:12px 0}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:800}
+    .brand .logo{width:34px;height:34px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,.15);display:grid;place-items:center}
+    .brand .logo img{width:100%;height:100%;object-fit:contain}
+
+    /* hero */
+    .hero{
+      min-height:calc(100svh - var(--header-h));
+      display:grid;place-items:center;
+      background:
+        radial-gradient(1000px 280px at 70% -10%, color-mix(in oklch, var(--brand) 18%, transparent), transparent 60%),
+        radial-gradient(900px 260px at 0% 10%, color-mix(in oklch, var(--accent) 16%, transparent), transparent 60%);
+      padding:48px 0
+    }
+    .wrap{width:100%}
+    .thanks{padding:28px; text-align:center}
+    .icon-wrap{
+      width:84px;height:84px;border-radius:22px;margin:0 auto 14px;
+      display:grid;place-items:center;background:rgba(87,160,90,.12);border:1px solid rgba(255,255,255,.08)
+    }
+    .icon{font-size:40px; line-height:1}
+    h1{margin:10px 0 8px;font-size:clamp(26px,4.6vw,44px);color:var(--title)}
+    p{margin:0;color:var(--muted);font-size:clamp(15px,2.4vw,18px)}
+    .actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+    .ghost{background:transparent;border:1px solid rgba(255,255,255,.18);color:var(--text)}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+
+    /* confetti */
+    .confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+    .c{position:absolute;width:8px;height:14px;opacity:.9;border-radius:3px;animation:fall 2.6s linear infinite}
+    @keyframes fall{from{transform:translateY(-20vh) rotate(0)}to{transform:translateY(110vh) rotate(520deg)}}
+  </style>
+</head>
+<body>
+  <!-- NAV -->
+  <header class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <span class="logo"><img src="/assets/images/logo.png" alt="Esnafız"></span>
+        <span>Esnafız</span>
+      </a>
+      <a class="btn" href="/#demo">Yeni Talep Gönder</a>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="confetti" aria-hidden="true" id="confetti"></div>
+    <div class="container wrap">
+      <div class="card thanks">
+        <div class="icon-wrap"><span class="icon">✅</span></div>
+        <h1>Teşekkürler! Talebin Alındı.</h1>
+        <p>En kısa sürede <span class="mono">yener35cenger@gmail.com</span> adresine dönüş yapacağız.</p>
+        <div class="actions">
+          <a class="btn" href="/#ozellikler">Özellikleri Keşfet</a>
+          <a class="btn ghost" href="/">Ana Sayfaya Dön</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // Basit confetti - hafif animasyon
+    (function(){
+      const colors = ['#3A7BD5','#2E6BB0','#DDBB00','#57A05A'];
+      const box = document.getElementById('confetti');
+      const n = 40;
+      for(let i=0;i<n;i++){
+        const s = document.createElement('span');
+        s.className='c';
+        s.style.left = Math.random()*100+'%';
+        s.style.top = (-10 - Math.random()*80) + 'vh';
+        s.style.background = colors[i%colors.length];
+        s.style.animationDelay = (Math.random()*2)+'s';
+        s.style.transform = `translateY(-20vh) rotate(${Math.random()*360}deg)`;
+        box.appendChild(s);
+      }
+      // 4sn sonra durdur
+      setTimeout(()=> box.replaceChildren(), 4500);
+    })();
+  </script>
+</body>
+</html>

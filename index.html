@@ -22,73 +22,66 @@
   <link rel="apple-touch-icon" href="/assets/images/logo.png">
 
   <style>
-    /* ---------- AppThemes (DARK varsayılan) ---------- */
+    /* ---------- AppThemes (DARK varsayılan) + spacing sistem ---------- */
     :root{
-      /* dark */
-      --bg:#121212;
-      --surface:#1E1E1E;
-      --surface-2:#2A2A2A;
-      --text:#E0E0E0;
-      --muted:#B3B3B3;
-      --title:#DDDDDD;
+      /* renkler */
+      --bg:#121212; --surface:#1E1E1E; --surface-2:#2A2A2A;
+      --text:#E0E0E0; --muted:#B3B3B3; --title:#DDDDDD;
+      --brand:#3A7BD5; --brand-2:#2E6BB0; --accent:#DDBB00;
+      --positive:#57A05A; --negative:#D1443E; --warning:#D88B26;
+      --lightBlue:rgba(74,144,226,.20); --lightGreen:rgba(0,180,130,.30);
 
-      --brand:#3A7BD5;         /* primary */
-      --brand-2:#2E6BB0;       /* primaryDark */
-      --accent:#DDBB00;        /* gold */
+      /* gölge & radius */
+      --shadow:0 12px 30px rgba(0,0,0,.35); --radius:18px;
 
-      --positive:#57A05A;
-      --negative:#D1443E;
-      --warning:#D88B26;
-
-      --lightBlue:rgba(74,144,226,.20);
-      --lightGreen:rgba(0,180,130,.30);
-
-      --shadow:0 12px 30px rgba(0,0,0,.35);
-      --radius:18px;
-      --max:1200px;
+      /* layout */
+      --max:1200px;       /* içerik genişliği */
+      --gutter:24px;      /* yatay kenar boşluğu */
+      --section:64px;     /* bölüm dikey boşluğu */
+      --card-pad:20px;    /* kart iç boşluğu */
+      --header-h:64px;    /* sticky header yüksekliği */
     }
-    /* Light tema */
     @media (prefers-color-scheme: light){
+      :root{ --bg:#f7f8fb; --surface:#fff; --surface-2:#fff;
+             --text:#0e1016; --muted:#5b6270; --title:#0e1016;
+             --shadow:0 10px 25px rgba(20,23,28,.08) }
+      header.nav{ background: rgba(255,255,255,.82);
+                  border-bottom:1px solid rgba(0,0,0,.06);
+                  backdrop-filter:saturate(140%) blur(10px) }
+    }
+    /* mobile spacing tune */
+    @media (max-width: 640px){
       :root{
-        --bg:#f7f8fb;
-        --surface:#ffffff;
-        --surface-2:#ffffff;
-        --text:#0e1016;
-        --muted:#5b6270;
-        --title:#0e1016;
-
-        --brand:#3A7BD5;
-        --brand-2:#2E6BB0;
-        --accent:#DDBB00;
-
-        --shadow:0 10px 25px rgba(20,23,28,.08);
-      }
-      header.nav{
-        background: rgba(255,255,255,.82);
-        border-bottom:1px solid rgba(0,0,0,.06);
-        backdrop-filter:saturate(140%) blur(10px);
+        --gutter:16px;
+        --section:44px;
+        --card-pad:16px;
+        --header-h:60px;
       }
     }
 
     /* ---------- Reset & base ---------- */
     *{box-sizing:border-box}
     html,body{margin:0;padding:0;font-family:'Segoe UI',Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);scroll-behavior:smooth}
+    /* sticky header ile anchor kaymasını engelle */
+    html{ scroll-padding-top: calc(var(--header-h) + 16px); }
+    section[id]{ scroll-margin-top: calc(var(--header-h) + 16px); }
+
     a{color:var(--brand);text-decoration:none}
-    .container{max-width:var(--max);margin-inline:auto;padding:0 20px}
+    .container{max-width:var(--max);margin-inline:auto;padding:0 var(--gutter)}
     .card{background:var(--surface);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);box-shadow:var(--shadow)}
     .btn{
       display:inline-flex;align-items:center;gap:10px;
-      padding:12px 20px;border-radius:12px;font-weight:600;letter-spacing:.2px;border:none;cursor:pointer;
+      padding:12px 18px;border-radius:12px;font-weight:600;letter-spacing:.2px;border:none;cursor:pointer;
       color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand-2));
       transition:transform .15s ease,box-shadow .15s ease;box-shadow:var(--shadow)
     }
     .btn:hover{transform:translateY(-1.5px)}
     .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.18);color:var(--text)}
-    .hint{color:var(--muted);font-size:.92rem}
+    .hint{color:var(--muted);font-size:.95rem}
     .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-    h1{font-size:clamp(28px,5vw,56px);line-height:1.08;margin:10px 0 14px;color:var(--title)}
-    h2{font-size:clamp(22px,3.4vw,36px);margin:0 0 14px;color:var(--title)}
-    section{padding:56px 0}
+    h1{font-size:clamp(28px,5vw,56px);line-height:1.08;margin:10px 0 12px;color:var(--title)}
+    h2{font-size:clamp(22px,3.4vw,36px);margin:0 0 12px;color:var(--title)}
+    section{padding:var(--section) 0}
 
     /* ---------- Nav ---------- */
     header.nav{
@@ -96,46 +89,43 @@
       border-bottom:1px solid rgba(255,255,255,.08);
       background:rgba(18,18,18,.6);backdrop-filter:blur(10px)
     }
-    .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:14px 0}
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;min-height:var(--header-h)}
     .brand{display:flex;align-items:center;gap:10px;font-weight:800}
-    .brand .logo{
-      width:34px;height:34px;border-radius:10px;display:grid;place-items:center;overflow:hidden;
-      border:1px solid rgba(255,255,255,.15);background:transparent
-    }
+    .brand .logo{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;overflow:hidden;border:1px solid rgba(255,255,255,.15);background:transparent}
     .brand .logo img{width:100%;height:100%;object-fit:contain;display:block}
-    .links{display:flex;gap:18px;flex-wrap:wrap}
+    .links{display:flex;gap:16px;flex-wrap:wrap}
     .links a{color:var(--text);opacity:.9}
 
     /* ---------- Hero ---------- */
     .hero{
-      padding:84px 0 44px;position:relative;overflow:visible;
+      padding:calc(var(--section) + 20px) 0 44px;position:relative;overflow:visible;
       background:
         radial-gradient(1100px 360px at 70% -10%, color-mix(in oklch, var(--brand) 20%, transparent) , transparent 60%),
         radial-gradient(900px 300px at 0% 10%, color-mix(in oklch, var(--accent) 18%, transparent), transparent 60%)
     }
     .hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:40px;align-items:center}
     .kicker{font-size:.95rem;color:var(--muted);text-transform:uppercase;letter-spacing:.18em}
-    .cta{display:flex;gap:12px;margin-top:22px;flex-wrap:wrap}
+    .cta{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
 
     /* Örnek ekran (sağ blok) */
-    .screen{padding:16px}
+    .screen{padding:var(--card-pad)}
     .screen-inner{display:grid;grid-template-columns:minmax(230px,320px) 1fr;gap:16px}
     .chip{display:inline-block;white-space:normal;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.06);color:var(--text);font-weight:600;font-size:.85rem}
 
     /* Özellik kartları */
-    .row{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-    .feat{padding:22px;display:flex;gap:14px}
-    .feat .icon{width:44px;height:44px;border-radius:12px;background:var(--surface-2);display:grid;place-items:center}
-    .split{display:grid;grid-template-columns:1fr 1fr;gap:26px}
-    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .row{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .feat{padding:var(--card-pad);display:flex;gap:12px}
+    .feat .icon{width:42px;height:42px;border-radius:12px;background:var(--surface-2);display:grid;place-items:center}
+    .split{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
     .list{display:grid;gap:10px}
     .list li{list-style:none;padding:12px 14px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:var(--surface-2)}
     .badge{padding:4px 10px;border-radius:999px;background:var(--lightGreen);color:#d7fff1;font-weight:700;letter-spacing:.04em;font-size:.8rem}
 
     /* KPI */
-    .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-    .kpi{padding:18px;text-align:center;background:var(--surface-2);border-radius:14px}
-    .kpi b{font-size:28px;display:block}
+    .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .kpi{padding:16px;text-align:center;background:var(--surface-2);border-radius:14px}
+    .kpi b{font-size:26px;display:block}
 
     /* Status renkleri */
     .crit{color:var(--negative)} .warn{color:var(--warning)} .ok{color:var(--positive)}
@@ -147,11 +137,11 @@
     .form{display:grid;gap:12px}
     input,textarea{width:100%;background:var(--surface-2);border:1px solid rgba(255,255,255,.12);padding:12px 14px;color:var(--text);border-radius:12px;outline:none}
     input:focus,textarea:focus{border-color:var(--brand)}
-    .note{font-size:.85rem;color:var(--muted)}
+    .note{font-size:.9rem;color:var(--muted)}
     .pill{padding:6px 10px;border-radius:999px;background:color-mix(in oklch, var(--brand) 20%, transparent);color:#eaf3ff;font-weight:700}
 
     /* Footer */
-    .foot{padding:40px 0;border-top:1px solid rgba(255,255,255,.1);color:var(--muted);font-size:.95rem}
+    .foot{padding:32px 0;border-top:1px solid rgba(255,255,255,.1);color:var(--muted);font-size:.95rem}
     .center{text-align:center}
 
     /* ---------- Mobile first ---------- */
@@ -163,9 +153,9 @@
     @media (max-width: 640px){
       .links{display:none}
       .row,.split,.grid-2,.kpis{grid-template-columns:1fr}
-      .nav-inner{gap:10px}
-      section{padding:44px 0}
-      .kpi b{font-size:24px}
+      .nav-inner{gap:8px}
+      .kpi b{font-size:22px}
+      .feat .icon{width:38px;height:38px}
     }
 
     @keyframes float{from{transform:translateY(0)}to{transform:translateY(-6px)}}
@@ -173,11 +163,11 @@
   </style>
 
   <script>
-    // Basit aktif bölüm vurgusu
+    // aktif bölüm vurgusu (hem "#id" hem "/#id" linklerini destekler)
     addEventListener('scroll', () => {
       const pos = scrollY + 120;
       document.querySelectorAll('section[id]').forEach(s=>{
-        const a = document.querySelector('a[href="#'+s.id+'"]');
+        const a = document.querySelector(`a[href="#${s.id}"], a[href="/#${s.id}"]`);
         if(!a) return;
         if(pos> s.offsetTop && pos < s.offsetTop+s.offsetHeight){ a.style.opacity='1'; a.style.fontWeight='800' }
         else { a.style.opacity='.9'; a.style.fontWeight='600' }
@@ -196,14 +186,14 @@
         <span class="pill">Beta</span>
       </div>
       <nav class="links">
-        <a href="#ozellikler">Özellikler</a>
-        <a href="#moduller">Modüller</a>
-        <a href="#yapay-zeka">Yapay Zekâ</a>
-        <a href="#entegrasyon">Entegrasyon</a>
-        <a href="#sss">SSS</a>
-        <a href="#iletisim">İletişim</a>
+        <a href="/#ozellikler">Özellikler</a>
+        <a href="/#moduller">Modüller</a>
+        <a href="/#yapay-zeka">Yapay Zekâ</a>
+        <a href="/#entegrasyon">Entegrasyon</a>
+        <a href="/#sss">SSS</a>
+        <a href="/#iletisim">İletişim</a>
       </nav>
-      <a class="btn" href="#demo">Demo Talep Et</a>
+      <a class="btn" href="/#demo">Demo Talep Et</a>
     </div>
   </header>
 
@@ -215,16 +205,16 @@
         <h1>Kasa, stok, satış ve <span style="background:linear-gradient(135deg,var(--brand),var(--brand-2));-webkit-background-clip:text;color:transparent">Yapay Zekâ analizleri</span> bir arada.</h1>
         <p class="hint" style="font-size:clamp(15px,2.2vw,20px)">Esnafız; küçük ve orta ölçekli işletmeler için geliştirilen, <b>Flutter</b> tabanlı, <b>Firebase</b> destekli, ölçeklenebilir bir yönetim platformudur. Barkodlu satıştan topluluk forumuna, finans raporlarından AI önerilerine kadar her şey tek yerde.</p>
         <div class="cta">
-          <a class="btn" href="#demo">Ücretsiz Demosu Al</a>
-          <a class="btn ghost" href="#ozellikler">Özellikleri Keşfet</a>
+          <a class="btn" href="/#demo">Ücretsiz Demosu Al</a>
+          <a class="btn ghost" href="/#ozellikler">Özellikleri Keşfet</a>
         </div>
-        <div style="margin-top:14px" class="hint">Hızlı • Güvenli • SSL — <span class="mono">esnafiz.app</span></div>
+        <div style="margin-top:12px" class="hint">Hızlı • Güvenli • SSL — <span class="mono">esnafiz.app</span></div>
       </div>
 
       <!-- Örnek ekran mockup -->
       <div class="card screen float" aria-hidden="true">
         <div class="screen-inner">
-          <div class="card" style="padding:12px">
+          <div class="card" style="padding:var(--card-pad)">
             <div class="chip">Stok Uyarıları</div>
             <ul class="list" style="margin:12px 0 0;padding:0">
               <li><b class="crit">ACİL</b> — Su 0.5L (2 gün içinde bitecek)</li>
@@ -232,14 +222,14 @@
               <li><b class="ok">OK</b> — Ayran (yeterli)</li>
             </ul>
           </div>
-          <div class="card" style="padding:16px">
+          <div class="card" style="padding:var(--card-pad)">
             <div class="kpis">
               <div class="kpi"><b>₺5.420</b><span class="hint">Bugünkü Ciro</span></div>
               <div class="kpi"><b>+12%</b><span class="hint">Haftalık</span></div>
               <div class="kpi"><b>38</b><span class="hint">Satış</span></div>
               <div class="kpi"><b>7</b><span class="hint">Uyarı</span></div>
             </div>
-            <div style="margin-top:16px" class="chip">AI: “Bugün 16:00–18:00 arası kasa yoğunluğu bekleniyor.”</div>
+            <div style="margin-top:12px" class="chip">AI: “Bugün 16:00–18:00 arası kasa yoğunluğu bekleniyor.”</div>
           </div>
         </div>
       </div>
@@ -251,7 +241,7 @@
     <div class="container">
       <h2>Öne çıkan özellikler</h2>
       <p class="hint">Turkuaz–mavi (primary) ve altın (accent) tonlarında Material uyumlu arayüz.</p>
-      <div class="row" style="margin-top:18px">
+      <div class="row" style="margin-top:14px">
         <div class="card feat"><div class="icon">📦</div><div><b>Stok & Ürün Yönetimi</b><div class="hint">Barkodla tara, hızlı stok güncelle, kritik stok uyarıları.</div></div></div>
         <div class="card feat"><div class="icon">🧾</div><div><b>Barkodlu Satış</b><div class="hint">Hızlı POS akışı, indirim/vergiler, günlük kasa raporları.</div></div></div>
         <div class="card feat"><div class="icon">📈</div><div><b>Finans & Raporlama</b><div class="hint">Gelir–gider, kârlılık, haftalık/aylık trendler ve CSV dışa aktarma.</div></div></div>
@@ -276,7 +266,7 @@
           <li>🧾 <b>Belgeler:</b> Fatura/irsaliye taslakları, dışa aktarma</li>
         </ul>
       </div>
-      <div class="card" style="padding:18px">
+      <div class="card" style="padding:var(--card-pad)">
         <span class="badge">Dakikalar içinde kurulum</span>
         <h3 style="margin:8px 0 6px;color:var(--title)">Kurulum Akışı</h3>
         <div class="grid-2">
@@ -285,7 +275,7 @@
           <div class="list li" style="border:none;background:var(--lightBlue)">3 — Barkodlu satışa başla</div>
           <div class="list li" style="border:none;background:var(--lightGreen)">4 — AI önerilerini aç</div>
         </div>
-        <p class="note" style="margin-top:10px">Veriler Firebase’de güvenle saklanır; istediğin zaman dışa aktarabilirsin.</p>
+        <p class="note" style="margin-top:8px">Veriler Firebase’de güvenle saklanır; istediğin zaman dışa aktarabilirsin.</p>
       </div>
     </div>
   </section>
@@ -303,7 +293,7 @@
           <li>🤖 <b>AI Chat:</b> “Bu hafta hangi ürünleri artırayım?” gibi sorular sor</li>
         </ul>
       </div>
-      <div class="card" style="padding:18px">
+      <div class="card" style="padding:var(--card-pad)">
         <div class="chip">Örnek AI önerisi</div>
         <pre class="mono" style="white-space:pre-wrap;background:var(--surface-2);padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,.08)">
 Stok analizi: Ayran 200ml haftalık satış hızı %18 arttı.
@@ -320,12 +310,12 @@ Aksiyon: &lt;Satın Alma Listesine Ekle&gt;
   <section id="entegrasyon">
     <div class="container">
       <h2>Altyapı & Entegrasyonlar</h2>
-      <div class="row" style="margin-top:14px">
+      <div class="row" style="margin-top:12px">
         <div class="card feat"><div class="icon">🔥</div><div><b>Firebase</b><div class="hint">Auth, Firestore, FCM, App Check</div></div></div>
         <div class="card feat"><div class="icon">🧠</div><div><b>OpenAI</b><div class="hint">GPT tabanlı öneri & sohbet</div></div></div>
         <div class="card feat"><div class="icon">⚙️</div><div><b>FastAPI</b><div class="hint">Analiz mikro servisleri</div></div></div>
       </div>
-      <p class="note" style="margin-top:10px">Geliştirici misin? REST/JSON uç noktalarına bağlanabilir, raporları dış sistemlere aktarabilirsin.</p>
+      <p class="note" style="margin-top:8px">Geliştirici misin? REST/JSON uç noktalarına bağlanabilir, raporları dış sistemlere aktarabilirsin.</p>
     </div>
   </section>
 
@@ -335,7 +325,7 @@ Aksiyon: &lt;Satın Alma Listesine Ekle&gt;
       <div>
         <h2>Ücretsiz demo iste</h2>
         <p class="hint">Tanıtım görüşmesi 15–20 dakika sürer. İhtiyacına göre kurulum planı çıkarırız.</p>
-        <form name="demo" method="POST" data-netlify="true" class="form card" style="padding:18px">
+        <form name="demo" method="POST" data-netlify="true" class="form card" style="padding:var(--card-pad)">
           <input type="hidden" name="form-name" value="demo">
           <input name="ad" placeholder="Ad Soyad" required>
           <input name="mail" type="email" placeholder="E-posta" required>
@@ -345,9 +335,9 @@ Aksiyon: &lt;Satın Alma Listesine Ekle&gt;
           <div class="note">Form Netlify ile güvenle iletilir. Yanıtı 24 saat içinde ulaştırırız.</div>
         </form>
       </div>
-      <div class="card" style="padding:18px">
+      <div class="card" style="padding:var(--card-pad)">
         <h3 style="color:var(--title)">Fiyatlandırma (yakında)</h3>
-        <div class="grid-2" style="margin-top:10px">
+        <div class="grid-2" style="margin-top:8px">
           <div class="list">
             <div class="list li"><b>Starter</b> — Tek kasa, temel raporlar</div>
             <div class="list li"><b>Pro</b> — Çoklu kasa, AI önerileri</div>
@@ -383,12 +373,12 @@ Aksiyon: &lt;Satın Alma Listesine Ekle&gt;
 
   <!-- İLETİŞİM -->
   <section id="iletisim">
-    <div class="container card" style="padding:22px">
+    <div class="container card" style="padding:var(--card-pad)">
       <div class="center">
         <h2>İletişim</h2>
         <p class="hint">Birlikte büyütelim.</p>
         <p><b>E-posta:</b> <a href="mailto:yener35cenger@gmail.com">yener35cenger@gmail.com</a> &nbsp;•&nbsp; <b>Konum:</b> İzmir, Türkiye</p>
-        <a class="btn" href="#demo">Demo Talep Et</a>
+        <a class="btn" href="/#demo">Demo Talep Et</a>
       </div>
     </div>
   </section>

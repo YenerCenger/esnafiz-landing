@@ -325,8 +325,9 @@ Aksiyon: &lt;Satın Alma Listesine Ekle&gt;
       <div>
         <h2>Ücretsiz demo iste</h2>
         <p class="hint">Tanıtım görüşmesi 15–20 dakika sürer. İhtiyacına göre kurulum planı çıkarırız.</p>
-        <form name="demo" method="POST" data-netlify="true" class="form card" style="padding:var(--card-pad)">
+        <form name="demo" method="POST" netlify action="/thanks.html" netlify-honeypot="bot-field" class="form card" style="padding:var(--card-pad)">
           <input type="hidden" name="form-name" value="demo">
+          <input type="text" name="bot-field" style="display:none">
           <input name="ad" placeholder="Ad Soyad" required>
           <input name="mail" type="email" placeholder="E-posta" required>
           <input name="isletme" placeholder="İşletme adı (opsiyonel)">

@@ -1,8 +1,20 @@
 [build]
-  base = ""      
+  base = ""
   publish = "."
   command = ""
 
+# Önce thanks istisnaları
+[[redirects]]
+  from = "/thanks.html"
+  to   = "/thanks.html"
+  status = 200
+
+[[redirects]]
+  from = "/thanks"
+  to   = "/thanks.html"
+  status = 200
+
+# En sonda SPA yakalayıcı
 [[redirects]]
   from = "/*"
   to   = "/index.html"

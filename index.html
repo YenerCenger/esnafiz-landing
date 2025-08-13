@@ -4,7 +4,8 @@
 <html lang="tr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- iOS çentikler için viewport-fit -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
   <title>Esnafız — Küçük İşletmeler için Akıllı Yönetim</title>
   <meta name="description" content="Esnafız; stok, satış, finans, topluluk ve yapay zekâ destekli analizleri tek yerde birleştiren modern işletme yönetim platformudur." />
@@ -95,7 +96,7 @@
 
     /* Mobile menu */
     .menu-btn{display:none;gap:8px;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:transparent;color:var(--text)}
-    .mobile-menu{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);display:none}
+    .mobile-menu{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);display:none;z-index:100}
     .mobile-menu .panel{position:absolute;top:0;right:0;width:min(86vw,360px);height:100%;background:var(--surface);border-left:1px solid rgba(255,255,255,.08);padding:18px;display:flex;flex-direction:column;gap:10px}
     .mobile-menu a{padding:12px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:var(--surface-2);color:var(--text)}
     .mobile-menu.open{display:block}
@@ -167,6 +168,18 @@
 
     @keyframes float{from{transform:translateY(0)}to{transform:translateY(-6px)}}
     .float{animation:float 2s ease-in-out infinite alternate}
+
+    /* Nav güvenli alan iç boşlukları (çentik/kenar) */
+    header.nav .container{
+      padding-left:calc(var(--gutter) + env(safe-area-inset-left));
+      padding-right:calc(var(--gutter) + env(safe-area-inset-right))
+    }
+    @supports not (padding: max(0px)){
+      header.nav .container{
+        padding-left:calc(var(--gutter) + 8px);
+        padding-right:calc(var(--gutter) + 8px)
+      }
+    }
   </style>
 
   <script>
@@ -180,6 +193,7 @@
         else { a.style.opacity='.9'; a.style.fontWeight='600' }
       })
     });
+
     // mobil menü
     function toggleMenu(open){
       const mm = document.getElementById('mm');
@@ -187,6 +201,17 @@
       if(open){ mm.classList.add('open'); body.style.overflow='hidden'; }
       else { mm.classList.remove('open'); body.style.overflow=''; }
     }
+
+    // erişilebilirlik: ESC ile kapat + inline yerine eventListener
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === 'Escape') toggleMenu(false);
+    });
+    document.addEventListener('DOMContentLoaded', ()=>{
+      const openBtn = document.getElementById('open-menu');
+      const closeBtn = document.getElementById('close-menu');
+      if(openBtn) openBtn.addEventListener('click', ()=>toggleMenu(true));
+      if(closeBtn) closeBtn.addEventListener('click', ()=>toggleMenu(false));
+    });
   </script>
 </head>
 <body>
@@ -207,7 +232,8 @@
         <a href="/#sss">SSS</a>
         <a href="/#iletisim">İletişim</a>
       </nav>
-      <button class="menu-btn" aria-label="Menüyü aç" onclick="toggleMenu(true)">☰</button>
+      <!-- Inline onclick kaldırıldı; id ile JS bağlanıyor -->
+      <button id="open-menu" class="menu-btn" aria-label="Menüyü aç" type="button">☰</button>
       <!-- Demo CTA KALDIRILDI -->
     </div>
   </header>
@@ -217,7 +243,7 @@
     <div class="panel" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px">
         <div style="display:flex;align-items:center;gap:10px;font-weight:800"><img src="assets/images/logo.png" alt="" style="width:28px;height:28px;border-radius:8px;border:1px solid rgba(255,255,255,.15)"><span>Esnafız</span></div>
-        <button class="menu-btn" aria-label="Menüyü kapat" onclick="toggleMenu(false)">✕</button>
+        <button id="close-menu" class="menu-btn" aria-label="Menüyü kapat" type="button">✕</button>
       </div>
       <a href="/#ozellikler" onclick="toggleMenu(false)">Özellikler</a>
       <a href="/#moduller" onclick="toggleMenu(false)">Modüller</a>

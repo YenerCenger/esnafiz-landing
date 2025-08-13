@@ -1,4 +1,4 @@
-<!-- deploy test: 2025-08-12 16:xx -->
+<!-- deploy test: 2025-08-13 14:xx -->
 
 <!DOCTYPE html>
 <html lang="tr">
@@ -12,7 +12,7 @@
 
   <!-- Open Graph -->
   <meta property="og:title" content="Esnafız — Küçük İşletmeler için Akıllı Yönetim" />
-  <meta property="og:description" content="Stok, satış, topluluk ve yapay zekâ analizleri tek yerde. Ücretsiz tanıtım demosu için tıklayın." />
+  <meta property="og:description" content="Stok, satış, topluluk ve yapay zekâ analizleri tek yerde. Yakında!" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://esnafiz.app" />
 
@@ -70,11 +70,12 @@
     .container{max-width:var(--max);margin-inline:auto;padding:0 var(--gutter)}
     .card{background:var(--surface);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);box-shadow:var(--shadow)}
     .btn{
-      display:inline-flex;align-items:center;gap:10px;
+      display:inline-flex;align-items:center;justify-content:center;gap:10px;
       padding:12px 18px;border-radius:12px;font-weight:600;letter-spacing:.2px;border:none;cursor:pointer;
       color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand-2));
       transition:transform .15s ease,box-shadow .15s ease;box-shadow:var(--shadow)
     }
+    .btn[disabled]{opacity:.55;cursor:not-allowed}
     .btn:hover{transform:translateY(-1.5px)}
     .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.18);color:var(--text)}
     .hint{color:var(--muted);font-size:.95rem}
@@ -84,17 +85,20 @@
     section{padding:var(--section) 0}
 
     /* ---------- Nav ---------- */
-    header.nav{
-      position:sticky;top:0;z-index:50;width:100%;
-      border-bottom:1px solid rgba(255,255,255,.08);
-      background:rgba(18,18,18,.6);backdrop-filter:blur(10px)
-    }
+    header.nav{ position:sticky;top:0;z-index:50;width:100%;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(18,18,18,.6);backdrop-filter:blur(10px) }
     .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;min-height:var(--header-h)}
     .brand{display:flex;align-items:center;gap:10px;font-weight:800}
     .brand .logo{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;overflow:hidden;border:1px solid rgba(255,255,255,.15);background:transparent}
     .brand .logo img{width:100%;height:100%;object-fit:contain;display:block}
     .links{display:flex;gap:16px;flex-wrap:wrap}
     .links a{color:var(--text);opacity:.9}
+
+    /* Mobile menu */
+    .menu-btn{display:none;gap:8px;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:transparent;color:var(--text)}
+    .mobile-menu{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);display:none}
+    .mobile-menu .panel{position:absolute;top:0;right:0;width:min(86vw,360px);height:100%;background:var(--surface);border-left:1px solid rgba(255,255,255,.08);padding:18px;display:flex;flex-direction:column;gap:10px}
+    .mobile-menu a{padding:12px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:var(--surface-2);color:var(--text)}
+    .mobile-menu.open{display:block}
 
     /* ---------- Hero ---------- */
     .hero{
@@ -152,10 +156,13 @@
     }
     @media (max-width: 640px){
       .links{display:none}
+      .menu-btn{display:inline-flex}
       .row,.split,.grid-2,.kpis{grid-template-columns:1fr}
       .nav-inner{gap:8px}
       .kpi b{font-size:22px}
       .feat .icon{width:38px;height:38px}
+      .cta .btn{flex:1 1 140px}
+      .screen{display:none} /* mobilde sağdaki büyük mockup'ı gizle: içerik daha hızlı ve sade */
     }
 
     @keyframes float{from{transform:translateY(0)}to{transform:translateY(-6px)}}
@@ -173,6 +180,13 @@
         else { a.style.opacity='.9'; a.style.fontWeight='600' }
       })
     });
+    // mobil menü
+    function toggleMenu(open){
+      const mm = document.getElementById('mm');
+      const body = document.body;
+      if(open){ mm.classList.add('open'); body.style.overflow='hidden'; }
+      else { mm.classList.remove('open'); body.style.overflow=''; }
+    }
   </script>
 </head>
 <body>
@@ -181,11 +195,11 @@
   <header class="nav">
     <div class="container nav-inner">
       <div class="brand">
-        <div class="logo"><img src="assets/images/logo.png" alt="Esnafız Logo"></div>
+        <a class="logo" href="#" aria-label="Esnafız Ana Sayfa"><img src="assets/images/logo.png" alt="Esnafız Logo"></a>
         <span>Esnafız</span>
         <span class="pill">Beta</span>
       </div>
-      <nav class="links">
+      <nav class="links" aria-label="Birincil">
         <a href="/#ozellikler">Özellikler</a>
         <a href="/#moduller">Modüller</a>
         <a href="/#yapay-zeka">Yapay Zekâ</a>
@@ -193,9 +207,26 @@
         <a href="/#sss">SSS</a>
         <a href="/#iletisim">İletişim</a>
       </nav>
-      <a class="btn" href="/#demo">Demo Talep Et</a>
+      <button class="menu-btn" aria-label="Menüyü aç" onclick="toggleMenu(true)">☰</button>
+      <!-- Demo CTA KALDIRILDI -->
     </div>
   </header>
+
+  <!-- Mobile slide-over menu -->
+  <div id="mm" class="mobile-menu" aria-hidden="true" onclick="toggleMenu(false)">
+    <div class="panel" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px">
+        <div style="display:flex;align-items:center;gap:10px;font-weight:800"><img src="assets/images/logo.png" alt="" style="width:28px;height:28px;border-radius:8px;border:1px solid rgba(255,255,255,.15)"><span>Esnafız</span></div>
+        <button class="menu-btn" aria-label="Menüyü kapat" onclick="toggleMenu(false)">✕</button>
+      </div>
+      <a href="/#ozellikler" onclick="toggleMenu(false)">Özellikler</a>
+      <a href="/#moduller" onclick="toggleMenu(false)">Modüller</a>
+      <a href="/#yapay-zeka" onclick="toggleMenu(false)">Yapay Zekâ</a>
+      <a href="/#entegrasyon" onclick="toggleMenu(false)">Entegrasyon</a>
+      <a href="/#sss" onclick="toggleMenu(false)">SSS</a>
+      <a href="/#iletisim" onclick="toggleMenu(false)">İletişim</a>
+    </div>
+  </div>
 
   <!-- HERO -->
   <section class="hero">
@@ -205,8 +236,8 @@
         <h1>Kasa, stok, satış ve <span style="background:linear-gradient(135deg,var(--brand),var(--brand-2));-webkit-background-clip:text;color:transparent">Yapay Zekâ analizleri</span> bir arada.</h1>
         <p class="hint" style="font-size:clamp(15px,2.2vw,20px)">Esnafız; küçük ve orta ölçekli işletmeler için geliştirilen, <b>Flutter</b> tabanlı, <b>Firebase</b> destekli, ölçeklenebilir bir yönetim platformudur. Barkodlu satıştan topluluk forumuna, finans raporlarından AI önerilerine kadar her şey tek yerde.</p>
         <div class="cta">
-          <a class="btn" href="/#demo">Ücretsiz Demosu Al</a>
-          <a class="btn ghost" href="/#ozellikler">Özellikleri Keşfet</a>
+          <a class="btn" href="/#ozellikler">Özellikleri Keşfet</a>
+          <a class="btn ghost" href="/#iletisim">Bize Ulaşın</a>
         </div>
         <div style="margin-top:12px" class="hint">Hızlı • Güvenli • SSL — <span class="mono">esnafiz.app</span></div>
       </div>
@@ -299,7 +330,7 @@
 Stok analizi: Ayran 200ml haftalık satış hızı %18 arttı.
 Öneri: Minimum 4 kasa ek stok.
 Gerekçe: Öğlen (12:00–14:00) satış yoğunluğu.
-Aksiyon: &lt;Satın Alma Listesine Ekle&gt;
+Aksiyon: <Satın Alma Listesine Ekle>
         </pre>
         <p class="note">Öneriler; sezon, saat aralığı ve kampanya etkilerini dikkate alır.</p>
       </div>
@@ -320,38 +351,10 @@ Aksiyon: &lt;Satın Alma Listesine Ekle&gt;
   </section>
 
   <!-- DEMO / FORM -->
-  <section id="demo">
-    <div class="container split">
-      <div>
-        <h2>Ücretsiz demo iste</h2>
-        <p class="hint">Tanıtım görüşmesi 15–20 dakika sürer. İhtiyacına göre kurulum planı çıkarırız.</p>
-        <form name="demo" method="POST" netlify action="/thanks.html" netlify-honeypot="bot-field" class="form card" style="padding:var(--card-pad)">
-          <input type="hidden" name="form-name" value="demo">
-          <input type="text" name="bot-field" style="display:none">
-          <input name="ad" placeholder="Ad Soyad" required>
-          <input name="mail" type="email" placeholder="E-posta" required>
-          <input name="isletme" placeholder="İşletme adı (opsiyonel)">
-          <textarea name="ihtiyac" rows="4" placeholder="Kısaca ihtiyacını anlat (örn. barkodlu satış + stok uyarıları)"></textarea>
-          <button class="btn" type="submit">Talebi Gönder</button>
-          <div class="note">Form Netlify ile güvenle iletilir. Yanıtı 24 saat içinde ulaştırırız.</div>
-        </form>
-      </div>
-      <div class="card" style="padding:var(--card-pad)">
-        <h3 style="color:var(--title)">Fiyatlandırma (yakında)</h3>
-        <div class="grid-2" style="margin-top:8px">
-          <div class="list">
-            <div class="list li"><b>Starter</b> — Tek kasa, temel raporlar</div>
-            <div class="list li"><b>Pro</b> — Çoklu kasa, AI önerileri</div>
-          </div>
-          <div class="list">
-            <div class="list li"><b>Enterprise</b> — Çoklu mağaza, özel destek</div>
-            <div class="list li"><b>Topluluk</b> — Forum & etkinlikler</div>
-          </div>
-        </div>
-        <p class="note">Öğrenci projeleri ve STK’lar için özel indirim planı uygulanır.</p>
-      </div>
-    </div>
-  </section>
+  <!--
+  *** İSTEK ÜZERİNE GEÇİCİ OLARAK DEVRE DIŞI BIRAKILDI ***
+  <section id="demo"> ... </section>
+  -->
 
   <!-- SSS -->
   <section id="sss">
@@ -379,7 +382,8 @@ Aksiyon: &lt;Satın Alma Listesine Ekle&gt;
         <h2>İletişim</h2>
         <p class="hint">Birlikte büyütelim.</p>
         <p><b>E-posta:</b> <a href="mailto:yener35cenger@gmail.com">yener35cenger@gmail.com</a> &nbsp;•&nbsp; <b>Konum:</b> İzmir, Türkiye</p>
-        <a class="btn" href="/#demo">Demo Talep Et</a>
+        <!-- Demo butonu kaldırıldı -->
+        <a class="btn" href="mailto:yener35cenger@gmail.com" aria-label="E-posta gönder">E-posta Gönder</a>
       </div>
     </div>
   </section>

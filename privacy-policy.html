@@ -1,40 +1,203 @@
+<!-- File: privacy-policy.html -->
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Gizlilik Politikası - Esnafız</title>
+  <meta name="description" content="Esnafız uygulamasının gizlilik politikası; hangi verileri topladığımız, nasıl kullandığımız, ödeme ve abonelik süreçleri, haklarınız." />
+  <meta name="theme-color" content="#3A7BD5" />
+  <link rel="icon" type="image/png" href="/assets/images/logo.png" sizes="32x32">
+
   <style>
-    body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; color: #333; }
-    h1 { color: #2c3e50; }
+    /* ------- Aynı tema değişkenleri ------- */
+    :root{
+      --bg:#121212; --surface:#1E1E1E; --surface-2:#2A2A2A;
+      --text:#E0E0E0; --muted:#B3B3B3; --title:#DDDDDD;
+      --brand:#3A7BD5; --brand-2:#2E6BB0; --accent:#DDBB00;
+      --shadow:0 12px 30px rgba(0,0,0,.35); --radius:18px;
+      --max:1200px; --gutter:24px; --section:56px; --card-pad:20px; --header-h:64px;
+    }
+    @media (prefers-color-scheme: light){
+      :root{ --bg:#f7f8fb; --surface:#fff; --surface-2:#fff;
+             --text:#0e1016; --muted:#5b6270; --title:#0e1016;
+             --shadow:0 10px 25px rgba(20,23,28,.08) }
+      header.nav{ background: rgba(255,255,255,.82);
+                  border-bottom:1px solid rgba(0,0,0,.06);
+                  backdrop-filter:saturate(140%) blur(10px) }
+    }
+    @media (max-width: 640px){
+      :root{ --gutter:16px; --section:40px; --card-pad:16px; --header-h:60px; }
+    }
+
+    /* ------- Reset & base ------- */
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;font-family:'Segoe UI',Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    html{ scroll-padding-top: calc(var(--header-h) + 16px); }
+    a{color:var(--brand);text-decoration:none}
+    h1{font-size:clamp(28px,5vw,44px);line-height:1.1;color:var(--title);margin:10px 0 10px}
+    h2{font-size:clamp(20px,3.4vw,28px);margin:26px 0 10px;color:var(--title)}
+    h3{margin:18px 0 8px}
+    p,li{color:var(--text);line-height:1.7}
+    .container{max-width:var(--max);margin-inline:auto;padding:0 var(--gutter)}
+    .card{background:var(--surface);border:1px solid rgba(255,255,255,.06);
+          border-radius:var(--radius);box-shadow:var(--shadow)}
+    .hint{color:var(--muted)}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+
+    /* ------- Nav ------- */
+    header.nav{ position:sticky;top:0;z-index:50;width:100%;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      background:rgba(18,18,18,.6);backdrop-filter:blur(10px) }
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;min-height:var(--header-h)}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:800}
+    .brand .logo{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;overflow:hidden;border:1px solid rgba(255,255,255,.15)}
+    .brand .logo img{width:100%;height:100%;object-fit:contain;display:block}
+    .links{display:flex;gap:16px;flex-wrap:wrap}
+    @media (max-width: 680px){ .links{display:none} }
+
+    /* ------- Content ------- */
+    .hero{padding:calc(var(--section) + 10px) 0 10px;background:
+      radial-gradient(1100px 360px at 70% -10%, color-mix(in oklch, var(--brand) 20%, transparent) , transparent 60%)}
+    .content{padding:var(--section) 0}
+    .pp{padding:24px}
+    .pp .section{padding:18px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:var(--surface-2);margin-top:12px}
+    .list{padding-left:18px}
+    .foot{padding:32px 0;border-top:1px solid rgba(255,255,255,.1);color:var(--muted);font-size:.95rem}
+    .center{text-align:center}
   </style>
 </head>
 <body>
-  <h1>Gizlilik Politikası</h1>
-  <p><strong>Esnafız</strong> uygulaması olarak kullanıcı gizliliğini önemsiyoruz. Bu gizlilik politikası, hangi bilgileri topladığımızı, nasıl kullandığımızı ve koruduğumuzu açıklamaktadır.</p>
 
-  <h2>Toplanan Veriler</h2>
-  <ul>
-    <li>Kayıt ve giriş için e-posta adresi.</li>
-    <li>Cihaz bilgileri (model, işletim sistemi, IP adresi).</li>
-    <li>Kullanım verileri ve uygulama istatistikleri (Firebase / Google Analytics).</li>
-  </ul>
+  <!-- NAV -->
+  <header class="nav">
+    <div class="container nav-inner">
+      <div class="brand">
+        <a class="logo" href="/" aria-label="Esnafız Ana Sayfa"><img src="/assets/images/logo.png" alt="Esnafız Logo"></a>
+        <span>Esnafız</span>
+      </div>
+      <nav class="links" aria-label="Birincil">
+        <a href="/#ozellikler">Özellikler</a>
+        <a href="/#moduller">Modüller</a>
+        <a href="/#yapay-zeka">Yapay Zekâ</a>
+        <a href="/#entegrasyon">Entegrasyon</a>
+        <a href="/#sss">SSS</a>
+        <a href="/#iletisim">İletişim</a>
+      </nav>
+    </div>
+  </header>
 
-  <h2>Verilerin Kullanımı</h2>
-  <ul>
-    <li>Kullanıcı hesabı oluşturma ve giriş işlemleri.</li>
-    <li>Uygulamanın performansını iyileştirme.</li>
-    <li>Kullanıcı deneyimini geliştirme.</li>
-  </ul>
+  <!-- Başlık -->
+  <section class="hero">
+    <div class="container">
+      <h1>Gizlilik Politikası</h1>
+      <p class="hint">Son güncelleme: <span id="pp-date" class="mono"></span></p>
+    </div>
+  </section>
 
-  <h2>Veri Paylaşımı</h2>
-  <p>Veriler, yalnızca Google Firebase ve benzeri üçüncü taraf servis sağlayıcılarla analiz amaçlı paylaşılabilir. Hiçbir şekilde üçüncü şahıslara satılmaz.</p>
+  <!-- İçerik -->
+  <section class="content">
+    <div class="container">
+      <div class="card pp">
 
-  <h2>Kullanıcı Hakları</h2>
-  <p>Kullanıcılar, verilerinin silinmesini <a href="mailto:esnafiz.info@gmail.com">esnafiz.info@gmail.com</a> adresine e-posta atarak talep edebilir.</p>
+        <div class="section">
+          <p><b>Esnafız</b> (“Uygulama”) olarak gizliliğinize önem veriyoruz. Bu metin; hangi verileri topladığımızı, nasıl kullandığımızı, kimlerle paylaştığımızı ve haklarınızı açıklar.</p>
+        </div>
 
-  <h2>İletişim</h2>
-  <p>Sorularınız için bizimle şu adresten iletişime geçebilirsiniz: 
-  <a href="mailto:esnafiz.info@gmail.com">esnafiz.info@gmail.com</a></p>
+        <div class="section">
+          <h2>1) Topladığımız Veriler</h2>
+          <ul class="list">
+            <li><b>Kayıt/Hesap Bilgileri:</b> e-posta adresi, ad/işletme adı.</li>
+            <li><b>Uygulama Verileri:</b> ürün/stok/satış kayıtları, iç iletişim/topluluk içerikleri.</li>
+            <li><b>Cihaz ve Log Bilgileri:</b> cihaz modeli, işletim sistemi sürümü, IP, çökme logları.</li>
+            <li><b>Kullanım İstatistikleri:</b> Firebase/Google Analytics ile olay bazlı kullanım verileri.</li>
+            <li><b>Çerezler/Benzeri Teknolojiler:</b> oturum ve performans amaçlı sınırlı çerezler.</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h2>2) Verileri Nasıl Kullanıyoruz</h2>
+          <ul class="list">
+            <li>Hesap oluşturma, <b>kimlik doğrulama</b> ve yetkilendirme.</li>
+            <li>Stok, satış ve rapor modüllerinin çalışması ve <b>performans iyileştirmeleri</b>.</li>
+            <li><b>Analitik</b> (ürün/özellik iyileştirme, hata tespiti).</li>
+            <li><b>Bildirim</b> (ör. stok uyarıları) amaçlı FCM kullanımı.</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h2>3) Abonelik ve Ödemeler</h2>
+          <p>Esnafız’da abonelik/ödeme özellikleri bulunabilir. Ödeme işlemleri <b>güvenilir üçüncü taraf ödeme sağlayıcıları</b> (ör. Stripe, iyzico vb.) üzerinden gerçekleştirilir. Kart bilgileri Uygulama tarafından <u>saklanmaz</u>; ödeme sağlayıcısının güvenli altyapısında işlenir. Fatura/belge düzenleme için gerekli asgari fatura bilgileri (işletme adı, vergi no, iletişim) işlenebilir.</p>
+        </div>
+
+        <div class="section">
+          <h2>4) Veri Paylaşımı</h2>
+          <ul class="list">
+            <li><b>Hizmet Sağlayıcılar:</b> Firebase (Auth, Firestore, FCM), analitik ve barındırma sağlayıcıları.</li>
+            <li><b>Yasal zorunluluklar:</b> Yetkili mercilerden gelen geçerli talepler.</li>
+            <li>Kullanıcı verileri <u>satılmaz</u>.</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h2>5) Veri Saklama Süresi</h2>
+          <p>Hesabınız aktif olduğu sürece ve/veya mevzuatın gerektirdiği azami süre boyunca veriler saklanır. Hesabın kapatılması veya silme talebinde makul süre içinde veri minimizasyonu uygulanır.</p>
+        </div>
+
+        <div class="section">
+          <h2>6) Veri Aktarımı</h2>
+          <p>Veriler, hizmet sağlayıcıların sunucuları nedeniyle ülke dışına aktarılabilir. Bu durumda <b>uygun güvenlik önlemleri</b> (sözleşmesel hükümler vb.) uygulanır.</p>
+        </div>
+
+        <div class="section">
+          <h2>7) Güvenlik</h2>
+          <p>Aktarımda TLS/SSL; erişimde rol tabanlı yetkilendirme ve Firebase App Check gibi <b>teknik/idari</b> tedbirler uygulanır. İnternette hiçbir yöntem %100 güvenli değildir; riskleri en aza indirmek için güncel önlemler alınır.</p>
+        </div>
+
+        <div class="section">
+          <h2>8) Haklarınız</h2>
+          <ul class="list">
+            <li>Verilerinize erişme, düzeltme, <b>silme</b> talebi.</li>
+            <li>İşlemeye itiraz/kvkk-gdpr kapsamında şikâyet.</li>
+            <li>Hesap kapatma ve veri taşınabilirliği talepleri.</li>
+          </ul>
+          <p>Bu haklar için <a href="mailto:esnafiz.info@gmail.com">esnafiz.info@gmail.com</a> adresine e-posta atabilirsiniz.</p>
+        </div>
+
+        <div class="section">
+          <h2>9) Çocuklara Yönelik Kullanım</h2>
+          <p>Uygulama <b>çocukları hedeflemez</b>. Yaş sınırlamaları Google Play hedef kitle beyanıyla uyumludur.</p>
+        </div>
+
+        <div class="section">
+          <h2>10) Reklam ve Takip Teknolojileri</h2>
+          <p>Şu an Uygulama içinde <b>reklam</b> gösterimi yoktur. İleride reklam eklenirse; reklam verileri ve takip teknolojileri bu politika ve Google Play beyanlarına uygun şekilde güncellenecek ve kullanıcıya açıkça bildirilecektir.</p>
+        </div>
+
+        <div class="section">
+          <h2>11) İletişim</h2>
+          <p>Sorularınız ve talepleriniz için: <a href="mailto:esnafiz.info@gmail.com">esnafiz.info@gmail.com</a></p>
+        </div>
+
+        <div class="section hint">
+          <p>Bu sayfa, hizmetler ve mevzuat değiştikçe güncellenebilir. Önemli değişiklikler, bu sayfa üzerinden duyurulur.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="container center">
+      © <span id="y"></span> Esnafız • Tüm hakları saklıdır · <a href="/">Ana sayfa</a>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('y').textContent = new Date().getFullYear();
+    const d = new Date();
+    const fmt = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    document.getElementById('pp-date').textContent = fmt;
+  </script>
 </body>
 </html>

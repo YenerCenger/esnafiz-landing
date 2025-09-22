@@ -1,152 +1,145 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Esnafız - Hizmet Şartları</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Hizmet Şartları - Esnafız</title>
+  <meta name="description" content="Esnafız uygulamasının Hizmet Şartları (Terms of Service). Abonelik, lisans, kullanıcı içeriği, sorumluluk sınırı, uyuşmazlık çözümü ve diğer hükümler." />
+  <meta name="theme-color" content="#3A7BD5" />
   <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      line-height: 1.6;
-      color: #333;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-      background-color: #f5f5f5;
+    :root{
+      --bg:#0f1115; --card:#141823; --text:#e7eaf0; --muted:#9aa3b2; --accent:#3A7BD5; --border:rgba(255,255,255,.08);
     }
-    .container {
-      background: white;
-      padding: 40px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    h1 {
-      color: #2c3e50;
-      border-bottom: 3px solid #3498db;
-      padding-bottom: 10px;
-    }
-    h2 {
-      color: #34495e;
-      margin-top: 30px;
-    }
-    .highlight {
-      background-color: #e8f4fd;
-      padding: 15px;
-      border-left: 4px solid #3498db;
-      margin: 20px 0;
-    }
-    .contact {
-      background-color: #f8f9fa;
-      padding: 20px;
-      border-radius: 5px;
-      margin-top: 30px;
-    }
-    ul { padding-left: 20px; }
-    li { margin-bottom: 8px; }
+    *{box-sizing:border-box}
+    body{margin:0; font-family:Segoe UI, Roboto, Arial, sans-serif; background:var(--bg); color:var(--text)}
+    a{color:var(--accent); text-decoration:none}
+    .wrap{max-width:1100px; margin:0 auto; padding:28px 20px}
+    h1{margin:8px 0 6px; font-size:clamp(28px,4vw,40px)}
+    h2{margin:24px 0 10px; font-size:clamp(20px,3vw,26px)}
+    h3{margin:12px 0 8px; font-size:clamp(16px,2.5vw,20px); color:var(--text)}
+    p, li{line-height:1.7}
+    .muted{color:var(--muted)}
+    .card{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:20px; margin:14px 0}
+    ul.compact li{margin:4px 0}
+    .inline-code{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background:rgba(255,255,255,.06); padding:2px 6px; border-radius:6px}
+    .callout{background:rgba(58,123,213,.08); border-left:3px solid var(--accent); padding:12px 14px; border-radius:10px}
+    footer{color:var(--muted); padding:30px 0; text-align:center}
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="wrap">
     <h1>Hizmet Şartları</h1>
-    <p><strong>Yürürlük Tarihi:</strong> 22/09/2025 • <strong>Son Güncelleme:</strong> 22/09/2025</p>
+    <p class="muted">Yürürlük Tarihi: 22/09/2025 • Son Güncelleme: 22/09/2025</p>
 
-    <h2>1) Giriş ve Kabul</h2>
-    <p>Bu Hizmet Şartları, Esnafız mobil uygulaması ve web hizmetlerinin kullanımını düzenler. Uygulamayı kullanarak bu şartları kabul etmiş sayılırsınız.</p>
-
-    <div class="highlight">
-      <strong>Önemli:</strong> Bu şartları dikkatlice okuyun. Uygulamayı kullanmaya devam etmeniz, bu şartları kabul ettiğiniz anlamına gelir.
+    <div class="card">
+      <h2>1) Giriş ve Bağlayıcılık</h2>
+      <p>Esnafız (“<b>Hizmet</b>”) mobil ve web uygulamalarını kullanmanız bu şartları kabul ettiğiniz anlamına gelir. Şartları kabul etmiyorsanız Hizmeti kullanmayınız.</p>
+      <div class="callout"><b>Önemli:</b> Esnafız işbu şartları zaman zaman güncelleyebilir; önemli değişiklikler uygulama içi bildirim/e-posta ile duyurulur.</div>
     </div>
 
-    <h2>2) Hizmet Tanımı</h2>
-    <p>Esnafız, küçük ve orta ölçekli işletmeler için tasarlanmış kapsamlı bir işletme yönetim platformudur.</p>
+    <div class="card">
+      <h2>2) Hizmet Tanımı</h2>
+      <p>Esnafız; KOBİ’lere yönelik stok/satış, çalışan, müşteri ve tedarikçi yönetimi ile AI destekli analiz özellikleri sunar.</p>
+    </div>
 
-    <h2>3) Hesap Oluşturma ve Güvenlik</h2>
-    <ul>
-      <li>Doğru ve güncel bilgiler sağlamalısınız</li>
-      <li>Hesap bilgilerinizi gizli tutmalısınız</li>
-      <li>Hesabınızın güvenliğinden siz sorumlusunuz</li>
-      <li>Şüpheli aktiviteyi derhal bildirmelisiniz</li>
-    </ul>
+    <div class="card">
+      <h2>3) Hesap Oluşturma ve Güvenlik</h2>
+      <ul>
+        <li>Hesap bilgilerinizin doğruluğundan ve gizliliğinden siz sorumlusunuz.</li>
+        <li>Şüpheli kullanımda derhal <a href="mailto:info@esnafiz.app">info@esnafiz.app</a> adresine bildirim yapınız.</li>
+      </ul>
+    </div>
 
-    <h2>4) Premium Abonelik</h2>
-    <h3>4.1) Fiyatlandırma</h3>
-    <ul>
-      <li><strong>Yıllık Plan:</strong> 2.400₺/yıl (aylık 200₺) - İlk 30 gün ücretsiz</li>
-      <li><strong>Aylık Plan:</strong> 249₺/ay - İlk 7 gün ücretsiz</li>
-    </ul>
+    <div class="card">
+      <h2>4) Premium Abonelik ve Ödeme</h2>
+      <h3>4.1) Fiyatlandırma ve Planlar</h3>
+      <ul>
+        <li><b>Yıllık:</b> 2.400₺/yıl (aylık 200₺) – ilk 30 gün ücretsiz deneme</li>
+        <li><b>Aylık:</b> 249₺/ay – ilk 7 gün ücretsiz deneme</li>
+      </ul>
+      <h3>4.2) Ödeme İşleyici</h3>
+      <p>Tüm ödemeler yalnızca <b>Google Play Billing</b> veya <b>Apple App Store</b> altyapıları üzerinden işlenir. <u>Kart verileri Esnafız tarafından saklanmaz.</u></p>
+      <h3>4.3) Otomatik Yenileme, İptal ve İade</h3>
+      <p>Abonelik dönem sonunda otomatik yenilenir. Deneme bitiminde iptal edilmemiş planlar ücretlendirilir. İptal için:</p>
+      <ul class="compact">
+        <li><b>Android:</b> Google Play → <i>Ödemeler ve Abonelikler</i> → <i>Abonelikler</i></li>
+        <li><b>iOS:</b> Ayarlar → Apple Kimliği → <i>Abonelikler</i></li>
+      </ul>
+      <p>İptal, mevcut fatura dönemi sonu itibarıyla geçerlidir; <b>kısmi dönem iadesi yoktur</b> (zorunlu hukuk saklıdır). Fiyat değişiklikleri yürürlüğe girmeden makul süre önce bildirilir.</p>
+    </div>
 
-    <h3>4.2) Ödeme ve İşleyici</h3>
-    <p>Tüm ödemeler Google Play Billing veya Apple App Store altyapısı üzerinden işlenir. Kart bilgileriniz Esnafız tarafından saklanmaz.</p>
+    <div class="card">
+      <h2>5) Kullanıcı Yükümlülükleri ve Yasaklı Kullanım</h2>
+      <ul>
+        <li>Yürürlükteki hukuk, fikri mülkiyet ve kişilik haklarına uygun kullanım.</li>
+        <li>Spam, zararlı yazılım, güvenlik önlemlerini aşma ve sistem yükü yaratma yasaktır.</li>
+      </ul>
+    </div>
 
-    <h3>4.3) Otomatik Yenileme, İptal ve İade</h3>
-    <p>Premium abonelikler dönem sonunda otomatik olarak yenilenir. Deneme süresi bitiminde iptal edilmemiş planlar otomatik ücretlendirilir. 
-    Abonelik, Google Play › Ödemeler ve Abonelikler › Abonelikler veya App Store › Ayarlar › Apple Kimliği › Abonelikler menüsünden istenen anda iptal edilebilir. 
-    İptal sonrası premium özellikler dönem sonuna kadar kullanılabilir. Kısmi dönem iadeleri yapılmaz (yasal zorunluluklar hariç). 
-    Fiyat değişiklikleri yürürlüğe girmeden makul süre önce bildirilir.</p>
+    <div class="card">
+      <h2>6) Lisans ve Kullanım Kısıtlamaları</h2>
+      <p>Esnafız, size kişisel/işletme içi ihtiyaçlarınız için <b>sınırlı, devredilemez ve münhasır olmayan</b> bir kullanım lisansı tanır. <b>Tersine mühendislik</b>, alt lisanslama, kiralama, güvenlik önlemlerini aşma ve yetkisiz otomasyon yasaktır.</p>
+    </div>
 
-    <h2>5) Kullanıcı Yükümlülükleri</h2>
-    <ul>
-      <li>Yasalara ve düzenlemelere uymak</li>
-      <li>Başkalarının haklarını ihlal etmemek</li>
-      <li>Yanıltıcı bilgi paylaşmamak</li>
-      <li>Kötüye kullanım yapmamak</li>
-    </ul>
+    <div class="card">
+      <h2>7) Kullanıcı İçeriği ve Moderasyon</h2>
+      <p>Topluluk/etkinlik içeriklerinin mülkiyeti sizde kalır; Esnafız’a, hizmetin sunumu ve tanıtımı amacıyla <b>dünya çapında, telifsiz, alt lisanslanabilir ve geri alınabilir</b> bir kullanım izni verirsiniz. Yasal ihlal/şikâyet halinde içerikler kaldırılabilir, hesaplar sınırlandırılabilir.</p>
+    </div>
 
-    <h2>6) Yasaklanan Kullanımlar</h2>
-    <ul>
-      <li>Yasadışı içerik paylaşımı</li>
-      <li>Spam gönderimi</li>
-      <li>Sahte hesap oluşturma</li>
-      <li>Sistem güvenliğini ihlal etme</li>
-    </ul>
+    <div class="card">
+      <h2>8) Hizmet Kesintileri</h2>
+      <p>Bakım, teknik sorun veya yasal yükümlülükler nedeniyle kesintiler yaşanabilir; makul çabayla hizmet sürekliliği amaçlanır.</p>
+    </div>
 
-    <h2>7) Lisans ve Kullanım Kısıtlamaları</h2>
-    <p>Esnafız size kişisel/işletme içi ihtiyaçlar için, devredilemez, münhasır olmayan sınırlı bir kullanım lisansı tanır. 
-    Hizmeti kiralama, alt lisanslama, tersine mühendislik, güvenlik önlemlerini aşma ve yetkisiz otomasyon yasaktır.</p>
+    <div class="card">
+      <h2>9) Sorumluluk Sınırı ve Garanti Reddi</h2>
+      <p>Hizmet <b>“olduğu gibi”</b> sunulur; zımni garantiler reddedilir. Esnafız’ın toplam sorumluluğu, ilgili iddia tarihinden önceki <b>12 ayda ödenmiş abonelik ücretleri</b> ile sınırlıdır. <b>Dolaylı/sonuçsal zararlar</b>, kâr/itibar kaybı kapsam dışıdır (zorunlu hukuk saklıdır).</p>
+    </div>
 
-    <h2>7.1) Kullanıcı İçeriği ve Moderasyon</h2>
-    <p>Kullanıcılar kendi içeriklerinin sahibidir; ancak Esnafız’a bu içerikleri hizmetin sunumu ve tanıtımı amacıyla 
-    dünya çapında, telifsiz, alt lisanslanabilir ve geri alınabilir bir kullanım izni verir. İhlal veya şikâyet halinde içerikleri kaldırma hakkımız saklıdır.</p>
+    <div class="card">
+      <h2>10) Fesih ve Sonuçları</h2>
+      <p>Şart ihlali, yasa dışı faaliyet veya uzun süreli atıl kullanımda hesap feshedilebilir. Fesih sonrası erişim kapanır; <b>yedekleme sorumluluğu kullanıcıdadır</b>. Fikri mülkiyet, sorumluluk sınırı, lisans, uyuşmazlık hükümleri fesih sonrasında da geçerlidir.</p>
+    </div>
 
-    <h2>8) Hizmet Kesintileri</h2>
-    <p>Bakım, teknik sorunlar veya yasal yükümlülükler nedeniyle hizmette kesinti yaşanabilir.</p>
+    <div class="card">
+      <h2>11) Ticari Elektronik İletiler</h2>
+      <p>Pazarlama iletileri yalnızca <b>rıza</b> ile gönderilir; rızanızı uygulama ayarlarından veya e-postalardaki <i>abonelik iptali</i> bağlantısından dilediğiniz an geri çekebilirsiniz.</p>
+    </div>
 
-    <h2>9) Sorumluluk Sınırı ve Garanti Reddi</h2>
-    <p>Hizmet “olduğu gibi” sunulur. Zımni garantiler reddedilir. Esnafız’ın toplam sorumluluğu, ilgili iddia tarihinden önceki 12 ayda ödenmiş abonelik ücretleri ile sınırlıdır. 
-    Dolaylı, sonuçsal veya kar kaybı türü zararlar kapsam dışıdır.</p>
+    <div class="card">
+      <h2>12) Üçüncü Taraf Servisler</h2>
+      <p>Firebase, Google, ödeme kuruluşları ve benzeri hizmetler kendi şart/politikalarına tabidir; bu servislerdeki kesinti ve değişikliklerden sorumluluk kabul edilmez.</p>
+    </div>
 
-    <h2>10) Hesap Sonlandırma ve Fesih</h2>
-    <p>Hesabınız hizmet şartlarını ihlal etmeniz, yasa dışı faaliyet veya uzun süre kullanılmaması durumunda feshedilebilir. 
-    Fesih sonrası erişiminiz kapanır; verilerinizi yedeklemek sizin sorumluluğunuzdadır. 
-    Fikri mülkiyet, sorumluluk sınırları ve lisans hükümleri fesih sonrası da geçerlidir.</p>
+    <div class="card">
+      <h2>13) Gizlilik Atfı</h2>
+      <p>Kişisel veriler, KVKK ve GDPR dikkate alınarak <a href="https://esnafiz.app/privacy-policy">Gizlilik Politikası</a>’na uygun işlenir.</p>
+    </div>
 
-    <h2>11) Ticari Elektronik İletiler</h2>
-    <p>Onay vermeniz halinde e-posta veya uygulama içi bildirim ile pazarlama içerikleri gönderilebilir. 
-    Bu onayı dilediğiniz zaman uygulama ayarlarından geri alabilirsiniz.</p>
+    <div class="card">
+      <h2>14) Değişiklik Prosedürü</h2>
+      <p>Şartlar web sitesinde yayımlandığı anda yürürlüğe girer; önemli değişiklikler uygulama içi bildirim/e-posta ile duyurulur. Değişiklikten sonra hizmetin kullanılmaya devam edilmesi yeni şartların kabulü sayılır.</p>
+    </div>
 
-    <h2>12) Üçüncü Taraf Servisler</h2>
-    <p>Firebase, Google, ödeme sağlayıcıları gibi üçüncü taraf hizmetler kendi şart ve politikalarına tabidir; bu servislerin kesinti ve değişikliklerinden sorumluluk kabul edilmez.</p>
+    <div class="card">
+      <h2>15) Uyuşmazlık Çözümü ve Uygulanacak Hukuk</h2>
+      <ul>
+        <li><b>İlk adım:</b> iyi niyetli müzakere,</li>
+        <li><b>İkinci adım:</b> arabuluculuk,</li>
+        <li><b>Son adım:</b> İstanbul mahkemeleri ve icra daireleri. Türk hukuku uygulanır.</li>
+      </ul>
+    </div>
 
-    <h2>13) Gizlilik</h2>
-    <p>Kişisel veriler 6698 sayılı KVKK ve GDPR dikkate alınarak <a href="https://esnafiz.app/privacy-policy">Gizlilik Politikası</a>’na uygun işlenir.</p>
-
-    <h2>14) Değişiklik Prosedürü</h2>
-    <p>Şartlar güncellendiğinde web sayfasında yayımlanır; önemli değişiklikler uygulama içi bildirim/e-posta ile duyurulur. 
-    Değişiklikten sonra hizmetin kullanılmaya devam edilmesi yeni şartların kabulü anlamına gelir.</p>
-
-    <h2>15) Uyuşmazlık Çözümü ve Uygulanacak Hukuk</h2>
-    <p>Öncelikle müzakere ve arabuluculuk yoluna başvurulur. Anlaşma sağlanamazsa İstanbul mahkemeleri ve icra daireleri yetkilidir. Türk hukuku uygulanır.</p>
-
-    <div class="contact">
+    <div class="card">
       <h2>16) İletişim</h2>
-      <p><strong>Veri Sorumlusu:</strong> Yener Cenger – Şahıs Şirketi</p>
-      <p><strong>E-posta:</strong> info@esnafiz.app</p>
-      <p><strong>Web:</strong> https://esnafiz.app</p>
+      <ul class="compact">
+        <li><b>Veri Sorumlusu:</b> Yener Cenger – Şahıs Şirketi</li>
+        <li><b>E-posta:</b> <a href="mailto:info@esnafiz.app">info@esnafiz.app</a></li>
+        <li><b>Web:</b> <a href="https://esnafiz.app">https://esnafiz.app</a></li>
+      </ul>
     </div>
-
-    <p style="text-align: center; margin-top: 40px; color: #666;">
-      © 2025 Yener Cenger – Şahıs Şirketi • Tüm hakları saklıdır
-    </p>
   </div>
+
+  <footer>© 2025 Yener Cenger – Şahıs Şirketi • Tüm hakları saklıdır</footer>
 </body>
 </html>
